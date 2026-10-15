@@ -78,16 +78,26 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
     };
   }, [isDragging, onMouseMove, onMouseUp, onTouchMove, onTouchEnd]);
 
+  const isVertical = project?.aspect === '9:16' || project?.aspect?.includes('9:16');
+  const viewerAspectRatio = isVertical 
+    ? '9/16' 
+    : project?.aspect?.includes('2.39') 
+      ? '2.39/1' 
+      : '16/9';
+
   return (
     <div className="flex flex-col lg:flex-row gap-0 w-full" style={{ background: '#08080A' }}>
 
-      {/* ── Split-screen viewer ──────────────────────────────────────────── */}
+      {/* ── Split-screen viewer (Preserving Original Aspect Ratio) ──────────── */}
       <div
         ref={containerRef}
         data-cursor="DRAG"
-        className="relative overflow-hidden flex-1 split-slider-container"
+        className="relative overflow-hidden flex-1 split-slider-container bg-black"
         style={{
-          aspectRatio: '16/9',
+          aspectRatio: viewerAspectRatio,
+          maxHeight: isVertical ? '540px' : 'none',
+          maxWidth: isVertical ? '340px' : 'none',
+          margin: '0 auto',
           cursor: isDragging ? 'grabbing' : 'col-resize',
           userSelect: 'none',
           WebkitUserSelect: 'none',

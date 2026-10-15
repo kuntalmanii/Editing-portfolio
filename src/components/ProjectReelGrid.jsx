@@ -58,7 +58,7 @@ export default function ProjectReelGrid() {
       <LayoutGroup id="grid">
         <motion.div
           layout
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-start"
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((project, idx) => (
@@ -157,6 +157,9 @@ function ProjectCard({ project, index, onOpen }) {
     NARRATIVE: '#FB923C',
   }[project.category] ?? '#A1A1AA';
 
+  const isVertical = project.aspect === '9:16' || project.aspect?.includes('9:16');
+  const cardAspectRatio = isVertical ? '9/16' : project.aspect?.includes('2.39') ? '2.39/1' : '16/10';
+
   return (
     <motion.article
       layout
@@ -170,26 +173,37 @@ function ProjectCard({ project, index, onOpen }) {
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     >
-      {/* ── Thumbnail / video area ───────────────────────────────────── */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: '16/10' }}>
-        {/* Static poster */}
+      {/* ── Thumbnail / video area (Preserving Original Aspect Ratio) ─────────── */}
+      <div 
+        className="relative overflow-hidden bg-black flex items-center justify-center" 
+        style={{ aspectRatio: cardAspectRatio, maxHeight: isVertical ? '520px' : 'none' }}
+      >
+        {/* Soft ambient blur fill to eliminate harsh borders */}
+        <img
+          src={project.coverImage}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover blur-xl opacity-35 scale-110 pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Static poster in authentic original aspect ratio */}
         <img
           src={project.coverImage}
           alt={project.title}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="relative z-10 w-full h-full object-contain"
           style={{
             transition: 'opacity 0.4s ease, transform 0.6s ease',
             opacity: hovering && videoReady ? 0 : 1,
-            transform: hovering ? 'scale(1.04)' : 'scale(1)',
+            transform: hovering ? 'scale(1.02)' : 'scale(1)',
           }}
           loading="lazy"
         />
 
-        {/* Hover video preview */}
+        {/* Hover video preview in authentic original aspect ratio */}
         <video
           ref={videoRef}
           src={project.videoPreviewUrl}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="relative z-10 w-full h-full object-contain"
           muted loop playsInline preload="none"
           style={{
             opacity: hovering && videoReady ? 1 : 0,
