@@ -84,7 +84,8 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
       {/* ── Split-screen viewer ──────────────────────────────────────────── */}
       <div
         ref={containerRef}
-        className="relative overflow-hidden flex-1"
+        data-cursor="DRAG"
+        className="relative overflow-hidden flex-1 split-slider-container"
         style={{
           aspectRatio: '16/9',
           cursor: isDragging ? 'grabbing' : 'col-resize',

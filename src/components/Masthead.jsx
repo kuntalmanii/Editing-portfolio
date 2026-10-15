@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useTimecode } from '../hooks/useTimecode';
 import { siteMeta } from '../data/portfolioData';
+import { isAudioEnabled, toggleAudio, playClickSound } from '../utils/audioSystem';
 
 // ── Commission status cycling ───────────────────────────────────────────────
 const STATUS_LABELS = [
   { text: 'OPEN FOR COMMISSION', color: 'tally' },
-  { text: 'BOOKING Q1 2025', color: 'tally' },
+  { text: 'BOOKING Q4 2026', color: 'tally' },
   { text: 'DM TO INQUIRE', color: 'acid' },
 ];
 
@@ -15,6 +17,18 @@ export default function Masthead() {
   const [activeNav, setActiveNav] = useState(null);
   const [statusIdx, setStatusIdx] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [audioActive, setAudioActive] = useState(isAudioEnabled());
+
+  useEffect(() => {
+    const handleAudioEvent = (e) => setAudioActive(e.detail.enabled);
+    window.addEventListener('framerate-audio-changed', handleAudioEvent);
+    return () => window.removeEventListener('framerate-audio-changed', handleAudioEvent);
+  }, []);
+
+  const handleToggleAudio = () => {
+    const next = toggleAudio();
+    setAudioActive(next);
+  };
 
   // Cycle commission status every 4 seconds
   useEffect(() => {
@@ -67,15 +81,34 @@ export default function Masthead() {
               key={link.label}
               href={link.href}
               className={`nav-link ${activeNav === link.label ? 'nav-link-active' : ''}`}
-              onClick={() => setActiveNav(link.label)}
+              onClick={() => {
+                playClickSound(1300, 0.04);
+                setActiveNav(link.label);
+              }}
             >
               {link.label}
             </a>
           ))}
         </nav>
 
-        {/* RIGHT: Commission status + hamburger */}
+        {/* RIGHT: Commission status + Audio switch + hamburger */}
         <div className="flex items-center gap-3">
+
+          {/* Audio Feedback Switch */}
+          <button
+            type="button"
+            onClick={handleToggleAudio}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full font-mono text-[0.5625rem] tracking-wider uppercase border transition-colors ${
+              audioActive
+                ? 'bg-[#E2F952]/10 border-acid/40 text-acid shadow-acid-glow'
+                : 'bg-[#14141A] border-[#27272A] text-[#71717A] hover:text-white'
+            }`}
+            title={audioActive ? 'Audio Feedback ON (Click to mute)' : 'Audio Feedback MUTED (Click to enable)'}
+          >
+            {audioActive ? <Volume2 className="w-3 h-3 text-acid" /> : <VolumeX className="w-3 h-3 text-[#52525B]" />}
+            <span className="hidden sm:inline font-semibold">{audioActive ? 'FX ON' : 'MUTE'}</span>
+          </button>
+
           {/* Commission pill */}
           <AnimatePresence mode="wait">
             <motion.div

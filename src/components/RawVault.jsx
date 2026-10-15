@@ -317,6 +317,7 @@ export default function RawVault() {
                     exit={{ opacity: 0, scale: 0.96 }}
                     transition={{ duration: 0.3, delay: idx * 0.05 }}
                     onClick={() => setSelectedStillIndex(idx)}
+                    data-cursor="INSPECT"
                     className="contact-sheet-frame rounded-lg p-3 cursor-pointer group flex flex-col justify-between"
                   >
 
