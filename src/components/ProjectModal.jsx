@@ -122,28 +122,28 @@ export default function ProjectModal({ project, onClose }) {
           key="panel"
           variants={PANEL}
           initial="hidden" animate="visible" exit="exit"
-          className="relative w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden"
-          style={{ background: '#0D0D10', border: '1px solid #27272A', borderRadius: 3 }}
+          className="relative w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl transition-colors duration-200"
+          style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)', borderRadius: 3 }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* ── Top bar: title + close ───────────────────────────────────── */}
-          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: '1px solid #27272A' }}>
+          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: '1px solid var(--c-border)' }}>
             <div className="flex items-center gap-4">
               {/* Tally rec indicator */}
               <span className="tally-dot" />
               <div>
-                <p className="font-display font-bold text-text" style={{ fontFamily: "'Syne',sans-serif", fontSize: '1rem', letterSpacing: '0.06em' }}>
+                <p className="font-display font-bold text-[var(--c-text)]" style={{ fontFamily: "'Syne',sans-serif", fontSize: '1rem', letterSpacing: '0.06em' }}>
                   {project.title}
                 </p>
-                <p className="font-mono" style={{ fontSize: '0.6rem', letterSpacing: '0.14em', color: '#52525B', textTransform: 'uppercase', marginTop: 1 }}>
+                <p className="font-mono text-[var(--c-text-dim)]" style={{ fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 1 }}>
                   {project.category} · {project.client} · {project.year}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="flex items-center justify-center w-7 h-7 rounded-sm transition-colors"
-              style={{ border: '1px solid #27272A', color: '#71717A' }}
+              className="flex items-center justify-center w-7 h-7 rounded-sm transition-colors hover:text-[var(--c-text)]"
+              style={{ border: '1px solid var(--c-border)', color: 'var(--c-text-dim)' }}
               aria-label="Close modal"
             >
               <X size={13} />
@@ -219,7 +219,7 @@ export default function ProjectModal({ project, onClose }) {
                       {tc}
                     </span>
                   </div>
-                  <span className="font-mono" style={{ fontSize: '0.6rem', letterSpacing: '0.1em', color: '#52525B' }}>
+                  <span className="font-mono" style={{ fontSize: '0.6rem', letterSpacing: '0.1em', color: '#A1A1AA' }}>
                     {project.runTime} · {project.aspect}
                   </span>
                 </div>
@@ -227,23 +227,27 @@ export default function ProjectModal({ project, onClose }) {
             </div>
 
             {/* ── Tab bar ──────────────────────────────────────────────────── */}
-            <div className="flex" style={{ borderBottom: '1px solid #27272A' }}>
-              {TABS.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className="relative px-5 py-2.5 font-mono uppercase transition-colors"
-                  style={{
-                    fontSize: '0.6rem',
-                    letterSpacing: '0.18em',
-                    color: activeTab === tab ? '#E2F952' : '#52525B',
-                    borderBottom: activeTab === tab ? '1.5px solid #E2F952' : '1.5px solid transparent',
-                    background: 'transparent',
-                  }}
-                >
-                  {tab}
-                </button>
-              ))}
+            <div className="flex" style={{ borderBottom: '1px solid var(--c-border)' }}>
+              {TABS.map((tab) => {
+                const isActive = activeTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className="relative px-5 py-2.5 font-mono uppercase transition-colors"
+                    style={{
+                      fontSize: '0.6rem',
+                      letterSpacing: '0.18em',
+                      color: isActive ? 'var(--c-text)' : 'var(--c-text-dim)',
+                      fontWeight: isActive ? 700 : 500,
+                      borderBottom: isActive ? '2px solid var(--c-text)' : '2px solid transparent',
+                      background: 'transparent',
+                    }}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
             </div>
 
             {/* ── Tab content ──────────────────────────────────────────────── */}
@@ -341,13 +345,13 @@ function GradeTab({ project }) {
                   style={{
                     fontSize: '0.58rem',
                     letterSpacing: '0.12em',
-                    color: '#A1A1AA',
-                    border: '1px solid #27272A',
+                    color: 'var(--c-text)',
+                    border: '1px solid var(--c-border)',
                     borderRadius: 2,
-                    background: '#111114',
+                    background: 'var(--c-surface-inner)',
                   }}
                 >
-                  <Monitor size={9} style={{ color: '#52525B' }} />
+                  <Monitor size={9} style={{ color: 'var(--c-muted)' }} />
                   {sw}
                 </span>
               ))}
@@ -363,9 +367,9 @@ function GradeTab({ project }) {
                 <div
                   key={d}
                   className="flex items-center gap-2 font-mono"
-                  style={{ fontSize: '0.65rem', letterSpacing: '0.06em', color: '#A1A1AA' }}
+                  style={{ fontSize: '0.65rem', letterSpacing: '0.06em', color: 'var(--c-text)' }}
                 >
-                  <Film size={10} style={{ color: '#E2F952', flexShrink: 0 }} />
+                  <Film size={10} style={{ color: 'var(--c-tally)', flexShrink: 0 }} />
                   {d}
                 </div>
               ))}
@@ -408,7 +412,7 @@ function ProjectTab({ project }) {
 
         <div className="mt-5">
           <SectionLabel>Description</SectionLabel>
-          <p className="font-mono mt-2" style={{ fontSize: '0.68rem', letterSpacing: '0.03em', color: '#71717A', lineHeight: 1.7 }}>
+          <p className="font-mono mt-2" style={{ fontSize: '0.68rem', letterSpacing: '0.03em', color: 'var(--c-text-dim)', lineHeight: 1.7 }}>
             {project.description}
           </p>
         </div>
@@ -419,7 +423,14 @@ function ProjectTab({ project }) {
             <span
               key={tag}
               className="font-mono uppercase px-2 py-0.5"
-              style={{ fontSize: '0.55rem', letterSpacing: '0.14em', color: '#E2F952', border: '1px solid rgba(226,249,82,0.2)', borderRadius: 1 }}
+              style={{
+                fontSize: '0.55rem',
+                letterSpacing: '0.14em',
+                color: 'var(--c-text)',
+                border: '1px solid var(--c-border)',
+                background: 'var(--c-surface-inner)',
+                borderRadius: 1
+              }}
             >
               {tag}
             </span>
@@ -433,7 +444,7 @@ function ProjectTab({ project }) {
 // ── Small helpers ────────────────────────────────────────────────────────────
 function SectionLabel({ children }) {
   return (
-    <p className="font-mono uppercase" style={{ fontSize: '0.5rem', letterSpacing: '0.2em', color: '#52525B', borderBottom: '1px solid #27272A', paddingBottom: 6 }}>
+    <p className="font-mono uppercase" style={{ fontSize: '0.5rem', letterSpacing: '0.2em', color: 'var(--c-muted)', borderBottom: '1px solid var(--c-border)', paddingBottom: 6 }}>
       {children}
     </p>
   );
@@ -442,10 +453,10 @@ function SectionLabel({ children }) {
 function ModalMetaRow({ label, value }) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <span className="font-mono uppercase flex-shrink-0" style={{ fontSize: '0.55rem', letterSpacing: '0.14em', color: '#52525B' }}>
+      <span className="font-mono uppercase flex-shrink-0" style={{ fontSize: '0.55rem', letterSpacing: '0.14em', color: 'var(--c-muted)' }}>
         {label}
       </span>
-      <span className="font-mono text-right" style={{ fontSize: '0.65rem', letterSpacing: '0.04em', color: '#A1A1AA' }}>
+      <span className="font-mono text-right font-medium" style={{ fontSize: '0.65rem', letterSpacing: '0.04em', color: 'var(--c-text)' }}>
         {value}
       </span>
     </div>

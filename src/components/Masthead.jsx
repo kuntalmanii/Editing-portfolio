@@ -8,12 +8,11 @@ import {
   X, 
   ArrowUpRight, 
   Mail, 
-  Copy, 
-  Check, 
-  Clock, 
-  Activity, 
-  Film,
-  Sparkles
+  Check,
+  Copy,
+  Clock,
+  Sparkles,
+  Activity
 } from 'lucide-react';
 import { useTimecode } from '../hooks/useTimecode';
 import { siteMeta } from '../data/portfolioData';
@@ -21,32 +20,28 @@ import { isAudioEnabled, toggleAudio, playClickSound, playSuccessSound } from '.
 import { getTheme, toggleTheme } from '../utils/themeSystem';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Masthead (Cinematic Editorial HUD)
-// - Gliding pill active-section spy (smooth spring across nav items)
-// - Razor-thin scroll progress hairline (film transport progress)
-// - Audio waveform bars (animated dancing equalizer when FX ON)
-// - Click-to-contact interactive commission pill
-// - Timecode mode toggle (SMPTE vs Total Frames vs Local Time)
-// - Fullscreen cinematic mobile overlay with oversized Syne typography
+// Dynamic Floating Masthead (Interactive Editorial Dock)
+// - Floating dock architecture with spring physics on scroll
+// - Magnetic hover gliding pill tracker across navigation items
+// - Interactive running SMPTE Timecode with mode cycle & hover state
+// - Dynamic dancing audio equalizer visualizer (wave-bar keyframes)
+// - 360° spring-rotating studio theme switcher (Daylight vs Dark Room)
+// - Integrated luminous scroll progress perimeter hairline
+// - Fullscreen cinematic mobile overlay
 // ─────────────────────────────────────────────────────────────────────────────
 
-const STATUS_LABELS = [
-  { text: 'OPEN FOR COMMISSION', color: 'tally', hint: 'INQUIRE NOW' },
-  { text: 'BOOKING Q4 2026', color: 'tally', hint: 'RESERVE DATES' },
-  { text: 'DM TO INQUIRE', color: 'acid', hint: 'START DISPATCH' },
-];
-
-const SECTIONS = [
-  { id: 'work', label: 'WORK', num: '01' },
-  { id: 'vault', label: 'RAW VAULT', num: '02' },
-  { id: 'process', label: 'PROCESS', num: '03' },
-  { id: 'contact', label: 'CONTACT', num: '04' },
+const NAV_ITEMS = [
+  { id: 'work', label: 'WORK' },
+  { id: 'colorlab', label: 'COLOR LAB' },
+  { id: 'vault', label: 'RAW VAULT' },
+  { id: 'process', label: 'TIMELINE' },
+  { id: 'contact', label: 'CONTACT' },
 ];
 
 export default function Masthead() {
   const timecode = useTimecode(24);
   const [activeSection, setActiveSection] = useState('work');
-  const [statusIdx, setStatusIdx] = useState(0);
+  const [hoveredNav, setHoveredNav] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [audioActive, setAudioActive] = useState(isAudioEnabled());
   const [currentTheme, setCurrentTheme] = useState(getTheme());
@@ -55,6 +50,22 @@ export default function Masthead() {
   const [timecodeMode, setTimecodeMode] = useState('SMPTE'); // 'SMPTE', 'FRAMES', 'CLOCK'
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [localClock, setLocalClock] = useState('');
+  const [isHoveringLogo, setIsHoveringLogo] = useState(false);
+
+  // ── Timecode formatting ──────────────────────────────────────────────────
+  const tcParts = timecode.split(':');
+  const tcMain = tcParts.slice(0, 3).join(':');
+  const tcFrames = tcParts[3] ?? '00';
+  
+  const totalFramesApprox = useMemo(() => {
+    const [h, m, s, f] = tcParts.map(Number);
+    return ((h || 0) * 3600 + (m || 0) * 60 + (s || 0)) * 24 + (f || 0);
+  }, [tcParts]);
+
+  const cycleTimecodeMode = () => {
+    playClickSound(1500, 0.04);
+    setTimecodeMode(m => m === 'SMPTE' ? 'FRAMES' : m === 'FRAMES' ? 'CLOCK' : 'SMPTE');
+  };
 
   // ── Sync Audio Toggle State ──────────────────────────────────────────────
   useEffect(() => {
@@ -89,45 +100,14 @@ export default function Masthead() {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
       setScrollProgress(progress);
-      setIsScrolled(scrollY > 30);
+      setIsScrolled(scrollY > 25);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // ── Active Section Intersection Observer (Scroll-Spy) ─────────────────────
-  useEffect(() => {
-    const sectionElements = SECTIONS.map(s => document.getElementById(s.id)).filter(Boolean);
-    if (!sectionElements.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: '-20% 0px -55% 0px',
-        threshold: 0,
-      }
-    );
-
-    sectionElements.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  // ── Cycle commission status every 4 seconds ──────────────────────────────
-  useEffect(() => {
-    const id = setInterval(() => {
-      setStatusIdx(i => (i + 1) % STATUS_LABELS.length);
-    }, 4000);
-    return () => clearInterval(id);
-  }, []);
-
-  // ── Local IST Clock ──────────────────────────────────────────────────────
+  // ── Real-time Local Clock ────────────────────────────────────────────────
   useEffect(() => {
     const update = () => {
       try {
@@ -148,7 +128,30 @@ export default function Masthead() {
     return () => clearInterval(id);
   }, []);
 
-  // ── Lock body scroll when mobile overlay is open ─────────────────────────
+  // ── Active Section Scroll-Spy ────────────────────────────────────────────
+  useEffect(() => {
+    const sectionElements = NAV_ITEMS.map(s => document.getElementById(s.id)).filter(Boolean);
+    if (!sectionElements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: '-25% 0px -50% 0px',
+        threshold: 0,
+      }
+    );
+
+    sectionElements.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // ── Lock body scroll when mobile menu is open ────────────────────────────
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = 'hidden';
@@ -158,269 +161,257 @@ export default function Masthead() {
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
-  // ── Timecode formatting ──────────────────────────────────────────────────
-  const tcParts = timecode.split(':');
-  const tcMain = tcParts.slice(0, 3).join(':');
-  const tcFrames = tcParts[3] ?? '00';
-  
-  // Approximate total frames (HH * 3600 + MM * 60 + SS) * 24 + FF
-  const totalFramesApprox = useMemo(() => {
-    const [h, m, s, f] = tcParts.map(Number);
-    return ((h || 0) * 3600 + (m || 0) * 60 + (s || 0)) * 24 + (f || 0);
-  }, [tcParts]);
-
-  const cycleTimecodeMode = () => {
-    playClickSound(1500, 0.04);
-    setTimecodeMode(m => m === 'SMPTE' ? 'FRAMES' : m === 'FRAMES' ? 'CLOCK' : 'SMPTE');
-  };
-
   const copyEmailDirect = () => {
     playSuccessSound();
-    navigator.clipboard?.writeText(siteMeta.email);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(siteMeta.email);
+    }
     setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
+    setTimeout(() => setCopiedEmail(false), 2200);
   };
-
-  const status = STATUS_LABELS[statusIdx];
 
   return (
     <>
-      <header 
-        className={`masthead transition-all duration-300 ${
-          isScrolled ? 'bg-[#08080A]/95 shadow-2xl backdrop-blur-2xl' : 'bg-[#08080A]/85 backdrop-blur-xl'
-        }`}
-      >
-        {/* ── Main Bar (Height: 52px) ────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 h-[52px]">
+      {/* ── Fixed Floating Dock Wrapper ───────────────────────────────── */}
+      <header className="fixed top-0 left-0 right-0 z-50 pointer-events-none flex justify-center pt-2.5 sm:pt-4 px-3 sm:px-6">
+        
+        {/* Dynamic Island Dock Container */}
+        <motion.div
+          animate={{
+            y: 0,
+            scale: isScrolled ? 0.98 : 1,
+          }}
+          transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+          className={`pointer-events-auto relative w-full max-w-6xl rounded-2xl sm:rounded-full transition-all duration-300 border shadow-2xl backdrop-blur-2xl overflow-hidden ${
+            isScrolled 
+              ? 'bg-[var(--c-surface)]/92 border-[var(--c-border)] shadow-[0_16px_40px_rgba(0,0,0,0.5)]' 
+              : 'bg-[var(--c-surface)]/80 border-[var(--c-border)] shadow-xl'
+          }`}
+        >
+          {/* Main Content Row */}
+          <div className="flex items-center justify-between px-3.5 sm:px-6 py-2 sm:py-2.5 h-[56px] sm:h-[60px]">
 
-          {/* LEFT: Wordmark + Interactive Timecode */}
-          <div className="flex items-center gap-4 sm:gap-6">
-            
-            {/* Wordmark logo */}
-            <a 
-              href="#" 
-              onClick={() => playClickSound(1200, 0.04)}
-              className="flex items-center gap-2.5 group select-none"
-            >
-              <div className="tally-dot flex-shrink-0" />
-              <span
-                className="font-display font-black text-[0.95rem] tracking-[0.2em] text-white leading-none group-hover:text-acid transition-colors duration-300"
-                style={{ fontFamily: "'Syne', sans-serif" }}
+            {/* LEFT: Wordmark + Interactive Tally & Timecode Scrubber */}
+            <div className="flex items-center gap-2.5 sm:gap-4">
+              
+              {/* Brand Wordmark with Live Pulse */}
+              <a 
+                href="#" 
+                onMouseEnter={() => setIsHoveringLogo(true)}
+                onMouseLeave={() => setIsHoveringLogo(false)}
+                onClick={() => playClickSound(1200, 0.04)}
+                className="flex items-center gap-2.5 group select-none py-1"
               >
-                FRAME.RATE
-              </span>
-            </a>
-
-            <span className="hidden sm:block w-px h-4 bg-[#27272A]" />
-
-            {/* Interactive Timecode Display with Mode Switching */}
-            <button
-              type="button"
-              onClick={cycleTimecodeMode}
-              title="Click to cycle timecode format (SMPTE / FRAMES / IST CLOCK)"
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#111116] border border-[#1E1E24] hover:border-[#3F3F46] text-[#71717A] hover:text-white transition-all select-none font-mono text-[0.625rem]"
-            >
-              <Clock className="w-3 h-3 text-acid opacity-80" />
-              {timecodeMode === 'SMPTE' ? (
-                <div className="timecode flex items-center">
-                  <span>{tcMain}:</span>
-                  <span className="frames">{tcFrames}</span>
-                  <span className="text-[0.5rem] text-[#52525B] ml-1.5 uppercase tracking-wider">24fps</span>
+                <div className="relative flex items-center justify-center">
+                  <span className="w-2 h-2 rounded-full bg-tally animate-pulse" />
+                  {isHoveringLogo && (
+                    <motion.span 
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 2, opacity: 0 }}
+                      transition={{ duration: 0.8, repeat: Infinity }}
+                      className="absolute w-2 h-2 rounded-full bg-tally"
+                    />
+                  )}
                 </div>
-              ) : timecodeMode === 'FRAMES' ? (
-                <div className="font-mono text-acid font-bold">
-                  {totalFramesApprox.toLocaleString()} <span className="text-[#52525B] font-normal">FR</span>
-                </div>
-              ) : (
-                <div className="font-mono text-[#E4E4E7]">
-                  {localClock} <span className="text-acid font-bold">IST</span>
-                </div>
-              )}
-            </button>
+                
+                <span
+                  className="font-display font-black text-sm sm:text-base tracking-[0.18em] text-[var(--c-text)] leading-none group-hover:text-acid transition-colors duration-200"
+                  style={{ fontFamily: "'Syne', sans-serif" }}
+                >
+                  FRAME.RATE
+                </span>
+              </a>
 
-          </div>
+              <span className="hidden sm:block w-px h-4 bg-[var(--c-border)]" />
 
-          {/* CENTER: Desktop Gliding-Pill Navigation ──────────────────────── */}
-          <LayoutGroup id="navbar-pill">
-            <nav className="hidden md:flex items-center p-1 rounded-full bg-[#101015]/90 border border-[#27272A] shadow-inner" aria-label="Main navigation">
-              {SECTIONS.map((sec) => {
-                const isActive = activeSection === sec.id;
-
-                return (
-                  <a
-                    key={sec.id}
-                    href={`#${sec.id}`}
-                    onClick={() => {
-                      playClickSound(1300, 0.04);
-                      setActiveSection(sec.id);
-                    }}
-                    className={`relative px-4 py-1.5 rounded-full font-mono text-[0.6875rem] uppercase tracking-wider transition-colors z-10 flex items-center gap-1.5 ${
-                      isActive ? 'text-acid font-bold' : 'text-[#A1A1AA] hover:text-white'
-                    }`}
-                  >
-                    {/* Active Gliding Pill Background */}
-                    {isActive && (
-                      <motion.div
-                        layoutId="navGlidingPill"
-                        className="absolute inset-0 rounded-full bg-[#181822] border border-acid/35 shadow-sm"
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                    <span className="relative z-10 text-[0.55rem] text-[#52525B]">{sec.num}</span>
-                    <span className="relative z-10">{sec.label}</span>
-                  </a>
-                );
-              })}
-            </nav>
-          </LayoutGroup>
-
-          {/* RIGHT: Commission Pill + Audio Switch + Mobile Hamburger ───────── */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
-
-            {/* Audio Waveform Feedback Switch */}
-            <button
-              type="button"
-              onClick={handleToggleAudio}
-              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full font-mono text-[0.5625rem] tracking-wider uppercase border transition-all ${
-                audioActive
-                  ? 'bg-acid/[0.08] border-acid/40 text-acid shadow-acid-glow'
-                  : 'bg-[#121217] border-[#27272A] text-[#71717A] hover:text-[#D4D4D8] hover:border-[#3F3F46]'
-              }`}
-              title={audioActive ? 'Audio Feedback ON (Click to mute)' : 'Audio Feedback MUTED (Click to enable)'}
-            >
-              {audioActive ? (
-                /* Animated Equalizer Waveform Bars */
-                <div className="flex items-end gap-0.5 h-3 px-0.5">
-                  <span className="w-0.5 bg-acid rounded-t-sm wave-bar-1" />
-                  <span className="w-0.5 bg-acid rounded-t-sm wave-bar-2" />
-                  <span className="w-0.5 bg-acid rounded-t-sm wave-bar-3" />
-                </div>
-              ) : (
-                <VolumeX className="w-3 h-3 text-[#52525B]" />
-              )}
-              <span className="hidden sm:inline font-bold">
-                {audioActive ? 'FX ON' : 'FX OFF'}
-              </span>
-            </button>
-
-            {/* Studio Theme Switch Button */}
-            <button
-              type="button"
-              onClick={handleToggleTheme}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full font-mono text-[0.5625rem] tracking-wider uppercase border transition-all ${
-                currentTheme === 'light'
-                  ? 'bg-white border-[#CBD5E1] text-[#09090B] shadow-sm hover:border-[#94A3B8]'
-                  : 'bg-[#121217] border-[#27272A] text-[#D4D4D8] hover:text-white hover:border-acid/40'
-              }`}
-              title={currentTheme === 'dark' ? 'Switch to Daylight Studio Mode' : 'Switch to Dark Room Mode'}
-            >
-              {currentTheme === 'light' ? (
-                <Sun className="w-3 h-3 text-[#E02E24]" />
-              ) : (
-                <Moon className="w-3 h-3 text-acid" />
-              )}
-              <span className="hidden sm:inline font-bold">
-                {currentTheme === 'light' ? 'DAYLIGHT' : 'DARK ROOM'}
-              </span>
-            </button>
-
-            {/* Click-to-Contact Commission Pill */}
-            <a
-              href="#contact"
-              onClick={() => playClickSound(1400, 0.05)}
-              className="hidden sm:flex group relative items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#121217] border border-[#27272A] hover:border-tally/50 transition-all font-mono text-[0.625rem] tracking-wider uppercase shadow-sm"
-              title="Click to jump to Inquiry Terminal"
-            >
-              <div
-                className="tally-dot"
-                style={status.color === 'acid'
-                  ? { background: '#E2F952', boxShadow: '0 0 8px 2px rgba(226,249,82,0.5)' }
-                  : {}}
-              />
-              <span 
-                className="font-semibold transition-colors"
-                style={{ color: status.color === 'acid' ? '#E2F952' : '#FF3B30' }}
+              {/* Dynamic Interactive Timecode Pill */}
+              <button
+                type="button"
+                onClick={cycleTimecodeMode}
+                title="Click to cycle format (SMPTE / FRAMES / IST CLOCK)"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--c-surface-inner)] border border-[var(--c-border)] hover:border-acid/40 text-[var(--c-text-dim)] hover:text-[var(--c-text)] transition-all font-mono text-[0.625rem] select-none group/tc"
               >
-                {status.text}
-              </span>
-              <ArrowUpRight className="w-3 h-3 text-[#71717A] group-hover:text-white transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </a>
+                <Clock className="w-3 h-3 text-acid opacity-90 group-hover/tc:rotate-45 transition-transform duration-300" />
+                {timecodeMode === 'SMPTE' ? (
+                  <span className="flex items-center tracking-wider">
+                    <span className="text-[var(--c-text)] font-semibold">{tcMain}:</span>
+                    <span className="text-acid font-bold">{tcFrames}</span>
+                    <span className="text-[0.5rem] text-[var(--c-muted)] ml-1.5 font-normal uppercase">24fps</span>
+                  </span>
+                ) : timecodeMode === 'FRAMES' ? (
+                  <span className="text-acid font-bold tracking-wider">
+                    {totalFramesApprox.toLocaleString()} <span className="text-[var(--c-muted)] font-normal text-[0.5rem]">FR</span>
+                  </span>
+                ) : (
+                  <span className="text-[var(--c-text)] font-medium tracking-wider">
+                    {localClock} <span className="text-acid font-bold text-[0.5rem]">IST</span>
+                  </span>
+                )}
+              </button>
+            </div>
 
-            {/* Mobile Hamburger Button */}
-            <button
-              className="md:hidden flex flex-col items-center justify-center w-8 h-8 rounded-md bg-[#121217] border border-[#27272A] p-1.5"
-              aria-label="Toggle Navigation Menu"
-              onClick={() => {
-                playClickSound(1200, 0.04);
-                setMenuOpen(v => !v);
-              }}
-            >
-              <span
-                className="block h-[1.5px] w-4 bg-text transition-all duration-200"
-                style={{ transform: menuOpen ? 'rotate(45deg) translate(2.5px, 3.5px)' : 'none' }}
-              />
-              <span
-                className="block h-[1.5px] bg-text transition-all duration-200 my-1"
-                style={{ width: menuOpen ? '16px' : '10px', opacity: menuOpen ? 0 : 1 }}
-              />
-              <span
-                className="block h-[1.5px] w-4 bg-text transition-all duration-200"
-                style={{ transform: menuOpen ? 'rotate(-45deg) translate(2.5px, -3.5px)' : 'none' }}
-              />
-            </button>
+            {/* CENTER: Magnetic Gliding Hover Navigation ───────────────────── */}
+            <LayoutGroup id="dynamic-nav-pill">
+              <nav 
+                className="hidden md:flex items-center p-1 rounded-full bg-[var(--c-surface-inner)]/80 border border-[var(--c-border)] shadow-inner relative" 
+                onMouseLeave={() => setHoveredNav(null)}
+                aria-label="Main navigation"
+              >
+                {NAV_ITEMS.map((sec) => {
+                  const isCurrentActive = activeSection === sec.id;
+                  const isHovered = hoveredNav === sec.id;
+                  const isHighlighted = hoveredNav !== null ? isHovered : isCurrentActive;
+
+                  return (
+                    <a
+                      key={sec.id}
+                      href={`#${sec.id}`}
+                      onMouseEnter={() => {
+                        playClickSound(1800, 0.02);
+                        setHoveredNav(sec.id);
+                      }}
+                      onClick={() => {
+                        playClickSound(1300, 0.04);
+                        setActiveSection(sec.id);
+                      }}
+                      className={`relative px-4 py-1.5 rounded-full font-mono text-xs uppercase tracking-wider transition-colors z-10 select-none ${
+                        isHighlighted ? 'text-black font-bold' : 'text-[var(--c-text-dim)] hover:text-[var(--c-text)]'
+                      }`}
+                    >
+                      {/* Active & Hover Gliding Pill Background */}
+                      {isHighlighted && (
+                        <motion.div
+                          layoutId="dynamicNavGlidingPill"
+                          className="absolute inset-0 rounded-full bg-acid shadow-acid-glow"
+                          transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                        />
+                      )}
+                      
+                      <span className="relative z-10 flex items-center gap-1.5">
+                        {sec.label}
+                        {isCurrentActive && !isHighlighted && (
+                          <span className="w-1 h-1 rounded-full bg-acid animate-ping" />
+                        )}
+                      </span>
+                    </a>
+                  );
+                })}
+              </nav>
+            </LayoutGroup>
+
+            {/* RIGHT: Dynamic Action Cluster ───────────────────────────────── */}
+            <div className="flex items-center gap-2 sm:gap-2.5">
+
+              {/* Dynamic Audio Equalizer Waveform Button */}
+              <button
+                type="button"
+                onClick={handleToggleAudio}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[0.625rem] tracking-wider uppercase border transition-all ${
+                  audioActive
+                    ? 'bg-acid/10 border-acid/50 text-acid shadow-acid-glow'
+                    : 'bg-[var(--c-surface-inner)] border-[var(--c-border)] text-[var(--c-muted)] hover:text-[var(--c-text)]'
+                }`}
+                title={audioActive ? 'Audio Feedback ON (Click to mute)' : 'Audio Feedback MUTED (Click to enable)'}
+                aria-label="Toggle UI Audio"
+              >
+                {audioActive ? (
+                  /* Animated Dancing Audio Waveform Bars */
+                  <div className="flex items-end gap-0.5 h-3 px-0.5">
+                    <span className="w-0.5 bg-acid rounded-t-sm wave-bar-1" />
+                    <span className="w-0.5 bg-acid rounded-t-sm wave-bar-2" />
+                    <span className="w-0.5 bg-acid rounded-t-sm wave-bar-3" />
+                  </div>
+                ) : (
+                  <VolumeX className="w-3.5 h-3.5" />
+                )}
+                <span className="hidden lg:inline font-bold">
+                  {audioActive ? 'FX ON' : 'FX OFF'}
+                </span>
+              </button>
+
+              {/* Studio Theme Switcher with 360° Spring Animation */}
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.88, rotate: 180 }}
+                onClick={handleToggleTheme}
+                className="w-8 sm:w-9 h-8 sm:h-9 rounded-full flex items-center justify-center bg-[var(--c-surface-inner)] border border-[var(--c-border)] text-[var(--c-text-dim)] hover:text-[var(--c-text)] hover:border-acid/40 transition-all shadow-sm"
+                title={currentTheme === 'dark' ? 'Switch to Daylight Theme' : 'Switch to Dark Room Theme'}
+                aria-label="Toggle Theme"
+              >
+                {currentTheme === 'light' ? (
+                  <Sun className="w-3.5 h-3.5 text-amber-500" />
+                ) : (
+                  <Moon className="w-3.5 h-3.5 text-acid" />
+                )}
+              </motion.button>
+
+              {/* Dynamic Inquire CTA Button */}
+              <motion.a
+                href="#contact"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => playClickSound(1400, 0.05)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-acid text-black font-mono text-xs font-bold tracking-wider uppercase hover:bg-white transition-all shadow-acid-glow"
+              >
+                <span>INQUIRE</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </motion.a>
+
+              {/* Mobile Hamburger Button */}
+              <button
+                className="md:hidden flex flex-col items-center justify-center w-8 h-8 rounded-full bg-[var(--c-surface-inner)] border border-[var(--c-border)] p-1.5 ml-1"
+                aria-label="Toggle Navigation Menu"
+                onClick={() => {
+                  playClickSound(1200, 0.04);
+                  setMenuOpen(v => !v);
+                }}
+              >
+                <span
+                  className="block h-[1.5px] w-4 bg-[var(--c-text)] transition-all duration-200"
+                  style={{ transform: menuOpen ? 'rotate(45deg) translate(2.5px, 2.5px)' : 'none' }}
+                />
+                <span
+                  className="block h-[1.5px] bg-[var(--c-text)] transition-all duration-200 my-1"
+                  style={{ width: menuOpen ? '16px' : '10px', opacity: menuOpen ? 0 : 1 }}
+                />
+                <span
+                  className="block h-[1.5px] w-4 bg-[var(--c-text)] transition-all duration-200"
+                  style={{ transform: menuOpen ? 'rotate(-45deg) translate(2.5px, -2.5px)' : 'none' }}
+                />
+              </button>
+
+            </div>
 
           </div>
 
-        </div>
-
-        {/* ── Telemetry Sub-Bar (Height: 26px) ───────────────────────────── */}
-        <div className="hidden sm:flex items-center justify-between px-4 sm:px-6 md:px-8 h-[26px] border-t border-[#1C1C22] bg-[#0A0A0D]/90 text-[#71717A] font-mono text-[0.5625rem]">
-          <div className="flex items-center gap-4">
-            <TelemetryItem label="FINISHING" value={siteMeta.editor} />
-            <span className="text-[#27272A]">·</span>
-            <TelemetryItem label="SUITE" value="DaVinci Resolve 19" />
-            <span className="text-[#27272A]">·</span>
-            <TelemetryItem label="COLOR PIPELINE" value="ACEScc 1.3 / P3-D65" highlight={true} />
-            <span className="text-[#27272A] hidden lg:inline">·</span>
-            <span className="hidden lg:inline text-[#52525B]">MONITOR: Flanders QD-OLED</span>
+          {/* ── Integrated Luminous Scroll Progress Line ─────────────────── */}
+          <div className="h-[1.5px] w-full bg-[var(--c-border)]/40 overflow-hidden">
+            <motion.div
+              className="h-full bg-acid shadow-acid-glow"
+              style={{ width: `${scrollProgress}%` }}
+              transition={{ ease: 'linear', duration: 0.05 }}
+            />
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-[#A1A1AA]">
-              <span className="w-1.5 h-1.5 rounded-full bg-tally animate-pulse" />
-              <span>REC 24fps</span>
-            </span>
-            <span className="text-[#27272A]">|</span>
-            <span className="text-acid">{localClock} IST</span>
-          </div>
-        </div>
-
-        {/* ── Scroll Progress Hairline Indicator (1.5px) ────────────────── */}
-        <div className="relative h-[1.5px] w-full bg-[#181820] overflow-hidden">
-          <motion.div
-            className="h-full bg-gradient-to-r from-acid via-acid to-tally shadow-acid-glow"
-            style={{ width: `${scrollProgress}%` }}
-            transition={{ ease: 'linear', duration: 0.05 }}
-          />
-        </div>
+        </motion.div>
 
       </header>
 
-      {/* ── Fullscreen Cinematic Mobile Overlay ────────────────────────── */}
+      {/* ── Fullscreen Clean Mobile Overlay ──────────────────────────────── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[100] bg-[#08080A]/96 backdrop-blur-3xl flex flex-col justify-between p-6 sm:p-8 md:hidden"
+            transition={{ duration: 0.22 }}
+            className="fixed inset-0 z-[100] bg-[var(--c-bg)]/98 backdrop-blur-3xl flex flex-col justify-between p-6 sm:p-8 md:hidden"
           >
             {/* Overlay Top Bar */}
-            <div className="flex items-center justify-between border-b border-[#27272A] pb-4">
+            <div className="flex items-center justify-between border-b border-[var(--c-border)] pb-4">
               <div className="flex items-center gap-2 select-none">
-                <div className="tally-dot" />
-                <span className="font-display font-black text-lg tracking-widest text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
+                <span className="w-2 h-2 rounded-full bg-tally animate-pulse" />
+                <span className="font-display font-black text-base tracking-widest text-[var(--c-text)]" style={{ fontFamily: "'Syne', sans-serif" }}>
                   FRAME.RATE
                 </span>
               </div>
@@ -432,90 +423,76 @@ export default function Masthead() {
                   playClickSound(1000, 0.04);
                   setMenuOpen(false);
                 }}
-                className="w-9 h-9 rounded-full bg-[#16161D] border border-[#27272A] text-white flex items-center justify-center hover:border-acid transition-colors"
+                className="w-9 h-9 rounded-full bg-[var(--c-surface)] border border-[var(--c-border)] text-[var(--c-text)] flex items-center justify-center hover:border-acid transition-colors"
+                aria-label="Close menu"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Center Navigation Links (Oversized Syne Display Type) */}
-            <nav className="flex flex-col gap-5 py-6">
-              {SECTIONS.map((sec, idx) => {
+            {/* Navigation Links */}
+            <nav className="flex flex-col gap-6 py-8">
+              {NAV_ITEMS.map((sec, idx) => {
                 const isActive = activeSection === sec.id;
 
                 return (
                   <motion.a
                     key={sec.id}
                     href={`#${sec.id}`}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.08 * idx, duration: 0.3 }}
+                    transition={{ delay: 0.06 * idx, duration: 0.25 }}
                     onClick={() => {
                       playClickSound(1400, 0.04);
                       setActiveSection(sec.id);
                       setMenuOpen(false);
                     }}
-                    className="flex items-baseline gap-4 group"
+                    className={`font-display font-extrabold tracking-tight transition-colors text-3xl ${
+                      isActive ? 'text-acid' : 'text-[var(--c-text)] hover:text-acid'
+                    }`}
+                    style={{ fontFamily: "'Syne', sans-serif" }}
                   >
-                    <span className="font-mono text-xs text-[#52525B] group-hover:text-acid transition-colors">
-                      {sec.num}
-                    </span>
-                    <span
-                      className={`font-display font-extrabold tracking-tight transition-colors text-3xl sm:text-4xl ${
-                        isActive ? 'text-acid' : 'text-white group-hover:text-acid'
-                      }`}
-                      style={{ fontFamily: "'Syne', sans-serif" }}
-                    >
-                      {sec.label}
-                    </span>
+                    {sec.label}
                   </motion.a>
                 );
               })}
             </nav>
 
-            {/* Overlay Bottom Controls & Telemetry */}
-            <div className="border-t border-[#27272A] pt-5 space-y-4">
+            {/* Overlay Bottom Controls */}
+            <div className="border-t border-[var(--c-border)] pt-5 space-y-4 font-mono text-xs">
               
-              {/* Audio toggle + timecode row */}
-              <div className="flex items-center justify-between font-mono text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--c-muted)] uppercase tracking-wider">Audio Feedback</span>
                 <button
                   type="button"
                   onClick={handleToggleAudio}
-                  className="flex items-center gap-2 text-[#A1A1AA] hover:text-white transition-colors"
+                  className="px-3 py-1.5 rounded-full bg-[var(--c-surface)] border border-[var(--c-border)] text-[var(--c-text)] font-bold flex items-center gap-1.5"
                 >
-                  {audioActive ? <Volume2 className="w-4 h-4 text-acid" /> : <VolumeX className="w-4 h-4 text-[#52525B]" />}
-                  <span>AUDIO FEEDBACK: <strong className={audioActive ? 'text-acid' : ''}>{audioActive ? 'ON' : 'MUTED'}</strong></span>
+                  {audioActive ? <Volume2 className="w-3.5 h-3.5 text-acid" /> : <VolumeX className="w-3.5 h-3.5 text-[var(--c-muted)]" />}
+                  <span>{audioActive ? 'ENABLED' : 'MUTED'}</span>
                 </button>
-
-                <span className="text-[#52525B]">
-                  {localClock} IST
-                </span>
               </div>
 
-              {/* Theme toggle row */}
-              <div className="flex items-center justify-between font-mono text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--c-muted)] uppercase tracking-wider">Theme Mode</span>
                 <button
                   type="button"
                   onClick={handleToggleTheme}
-                  className="flex items-center gap-2 text-[#A1A1AA] hover:text-white transition-colors"
+                  className="px-3 py-1.5 rounded-full bg-[var(--c-surface)] border border-[var(--c-border)] text-[var(--c-text)] font-bold flex items-center gap-1.5"
                 >
-                  {currentTheme === 'light' ? <Sun className="w-4 h-4 text-[#E02E24]" /> : <Moon className="w-4 h-4 text-acid" />}
-                  <span>STUDIO THEME: <strong className={currentTheme === 'light' ? 'text-[#E02E24]' : 'text-acid'}>{currentTheme === 'light' ? 'DAYLIGHT' : 'DARK ROOM'}</strong></span>
+                  {currentTheme === 'light' ? <Sun className="w-3.5 h-3.5 text-amber-500" /> : <Moon className="w-3.5 h-3.5 text-acid" />}
+                  <span>{currentTheme === 'light' ? 'DAYLIGHT' : 'DARK ROOM'}</span>
                 </button>
-
-                <span className="text-[0.625rem] px-2 py-0.5 rounded border border-[#27272A] text-[#71717A]">
-                  {currentTheme === 'light' ? 'HIGH-KEY' : 'ONYX'}
-                </span>
               </div>
 
-              {/* Commission CTA button */}
+              {/* Commission CTA */}
               <a
                 href="#contact"
                 onClick={() => {
                   playClickSound(1400, 0.04);
                   setMenuOpen(false);
                 }}
-                className="w-full py-3 rounded-lg bg-acid text-black font-mono text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2 shadow-acid-glow"
+                className="w-full py-3.5 rounded-xl bg-acid text-black font-mono text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2 shadow-acid-glow mt-2"
               >
                 <span>OPEN FOR COMMISSION — INQUIRE</span>
                 <ArrowUpRight className="w-4 h-4" />
@@ -525,17 +502,17 @@ export default function Masthead() {
               <button
                 type="button"
                 onClick={copyEmailDirect}
-                className="w-full py-2.5 rounded-lg bg-[#111116] border border-[#27272A] text-[#A1A1AA] font-mono text-[0.6875rem] flex items-center justify-center gap-2 hover:border-[#52525B]"
+                className="w-full py-2.5 rounded-xl bg-[var(--c-surface)] border border-[var(--c-border)] text-[var(--c-text-dim)] font-mono text-xs flex items-center justify-center gap-2"
               >
                 {copiedEmail ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-acid" />
-                    <span className="text-acid">COPIED TO CLIPBOARD</span>
+                    <span className="text-acid font-bold">COPIED TO CLIPBOARD</span>
                   </>
                 ) : (
                   <>
                     <Mail className="w-3.5 h-3.5" />
-                    <span>{siteMeta.email} (TAP TO COPY)</span>
+                    <span>{siteMeta.email}</span>
                   </>
                 )}
               </button>
@@ -546,19 +523,5 @@ export default function Masthead() {
         )}
       </AnimatePresence>
     </>
-  );
-}
-
-// ── Telemetry Cell Helper ────────────────────────────────────────────────────
-function TelemetryItem({ label, value, highlight = false }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="font-mono uppercase text-[0.5rem] tracking-wider text-[#52525B]">
-        {label}:
-      </span>
-      <span className={`font-mono text-[0.5625rem] tracking-wide ${highlight ? 'text-acid font-semibold' : 'text-[#A1A1AA]'}`}>
-        {value}
-      </span>
-    </div>
   );
 }

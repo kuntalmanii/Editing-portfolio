@@ -95,24 +95,20 @@ function FilterPill({ label, active, count, onClick }) {
       layout
       onClick={onClick}
       whileTap={{ scale: 0.96 }}
-      className="relative flex items-center gap-2 px-3.5 py-1.5 font-mono uppercase rounded-full transition-all duration-200"
-      style={{
-        fontSize: '0.6rem',
-        letterSpacing: '0.16em',
-        border: active ? '1px solid rgba(226,249,82,0.5)' : '1px solid #27272A',
-        background: active ? 'rgba(226,249,82,0.07)' : 'transparent',
-        color: active ? '#E2F952' : '#52525B',
-      }}
+      className={`relative flex items-center gap-2 px-3.5 py-1.5 font-mono uppercase rounded-full transition-all duration-200 border text-[0.6rem] tracking-[0.16em] ${
+        active
+          ? 'filter-pill-active border-acid/50 bg-acid/10 text-acid font-semibold shadow-sm'
+          : 'border-[var(--c-border)] bg-transparent text-[var(--c-text-dim)] hover:text-[var(--c-text)] hover:border-[var(--c-muted)]'
+      }`}
     >
       {active && (
         <motion.span
           layoutId="filter-pip"
-          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-          style={{ background: '#E2F952', boxShadow: '0 0 6px rgba(226,249,82,0.6)' }}
+          className="filter-pip w-1.5 h-1.5 rounded-full flex-shrink-0 bg-acid shadow-[0_0_6px_rgba(226,249,82,0.6)]"
         />
       )}
-      {label}
-      <span style={{ opacity: 0.45, fontSize: '0.5rem' }}>{count}</span>
+      <span>{label}</span>
+      <span className="opacity-50 text-[0.5rem]">{count}</span>
     </motion.button>
   );
 }
@@ -168,8 +164,8 @@ function ProjectCard({ project, index, onOpen }) {
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="group relative cursor-pointer"
-      style={{ background: '#111114', border: '1px solid #27272A', borderRadius: 2, overflow: 'hidden' }}
+      className="group relative cursor-pointer project-card transition-all duration-300"
+      style={{ background: 'var(--c-surface)', border: '1px solid var(--c-border)', borderRadius: 2, overflow: 'hidden' }}
       onClick={onOpen}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
@@ -226,7 +222,7 @@ function ProjectCard({ project, index, onOpen }) {
         {/* Top-right: year */}
         <div
           className="absolute top-3 right-3 font-mono"
-          style={{ fontSize: '0.5rem', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.3)' }}
+          style={{ fontSize: '0.5rem', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.4)' }}
         >
           {project.year}
         </div>
@@ -253,8 +249,8 @@ function ProjectCard({ project, index, onOpen }) {
 
         {/* Bottom runtime badge */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
-          <Clock size={9} style={{ color: '#71717A' }} />
-          <span className="font-mono" style={{ fontSize: '0.58rem', letterSpacing: '0.1em', color: '#71717A' }}>
+          <Clock size={9} style={{ color: '#A1A1AA' }} />
+          <span className="font-mono" style={{ fontSize: '0.58rem', letterSpacing: '0.1em', color: '#A1A1AA' }}>
             {project.runTime}
           </span>
         </div>
@@ -274,23 +270,23 @@ function ProjectCard({ project, index, onOpen }) {
       {/* ── Card body ────────────────────────────────────────────────── */}
       <div className="px-4 py-4">
         <h3
-          className="font-display font-bold text-text"
+          className="font-display font-bold text-[var(--c-text)]"
           style={{ fontFamily: "'Syne',sans-serif", fontSize: '1.05rem', letterSpacing: '0.03em', lineHeight: 1.1 }}
         >
           {project.title}
         </h3>
-        <p className="font-mono mt-0.5" style={{ fontSize: '0.62rem', letterSpacing: '0.06em', color: '#52525B' }}>
+        <p className="font-mono mt-0.5 text-[var(--c-text-dim)]" style={{ fontSize: '0.62rem', letterSpacing: '0.06em' }}>
           {project.subtitle}
         </p>
 
         {/* Divider */}
-        <div className="my-3" style={{ height: '1px', background: '#27272A' }} />
+        <div className="my-3" style={{ height: '1px', background: 'var(--c-border)' }} />
 
         {/* Meta row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MetaChip label="CLIENT" value={project.client} />
-            <span style={{ color: '#27272A' }}>·</span>
+            <span style={{ color: 'var(--c-border)' }}>·</span>
             <MetaChip label="COLOUR" value={project.colorSpace} />
           </div>
           {/* Hover CTA */}
@@ -298,7 +294,7 @@ function ProjectCard({ project, index, onOpen }) {
             animate={{ opacity: hovering ? 1 : 0 }}
             transition={{ duration: 0.2 }}
             className="flex items-center gap-1"
-            style={{ color: '#E2F952' }}
+            style={{ color: 'var(--c-text)' }}
           >
             <ExternalLink size={10} />
           </motion.div>
@@ -313,8 +309,9 @@ function ProjectCard({ project, index, onOpen }) {
               style={{
                 fontSize: '0.5rem',
                 letterSpacing: '0.12em',
-                color: '#3F3F46',
-                border: '1px solid #27272A',
+                color: 'var(--c-text-dim)',
+                border: '1px solid var(--c-border)',
+                background: 'var(--c-surface-inner)',
                 padding: '2px 7px',
                 borderRadius: 1,
               }}
@@ -339,10 +336,10 @@ function ProjectCard({ project, index, onOpen }) {
 function MetaChip({ label, value }) {
   return (
     <div className="flex flex-col">
-      <span className="font-mono uppercase" style={{ fontSize: '0.45rem', letterSpacing: '0.18em', color: '#3F3F46' }}>
+      <span className="font-mono uppercase" style={{ fontSize: '0.45rem', letterSpacing: '0.18em', color: 'var(--c-muted)' }}>
         {label}
       </span>
-      <span className="font-mono" style={{ fontSize: '0.6rem', letterSpacing: '0.04em', color: '#71717A' }}>
+      <span className="font-mono" style={{ fontSize: '0.6rem', letterSpacing: '0.04em', color: 'var(--c-text)' }}>
         {value}
       </span>
     </div>

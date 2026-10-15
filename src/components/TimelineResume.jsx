@@ -447,7 +447,7 @@ export default function TimelineResume() {
                           }}
                           className={`absolute top-2 bottom-2 rounded-md p-2 flex flex-col justify-between cursor-pointer transition-all group overflow-hidden border ${
                             isSelected
-                              ? 'border-acid bg-[#16161F] shadow-lg ring-1 ring-acid/50 z-20'
+                              ? 'timeline-clip-selected border-acid bg-[#16161F] shadow-lg ring-1 ring-acid/50 z-20'
                               : 'border-[#27272A] bg-[#101015] hover:border-[#52525B] hover:bg-[#14141B] z-10'
                           }`}
                         >
@@ -470,7 +470,7 @@ export default function TimelineResume() {
 
                           {/* Clip Title & Studio */}
                           <div className="min-w-0">
-                            <p className={`font-mono text-[0.6875rem] font-bold tracking-tight truncate ${
+                            <p className={`clip-title font-mono text-[0.6875rem] font-bold tracking-tight truncate ${
                               isSelected ? 'text-acid' : 'text-white group-hover:text-acid'
                             }`}>
                               {clip.title}

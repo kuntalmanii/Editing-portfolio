@@ -225,15 +225,15 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
         <motion.div
           layout
           className="flex-shrink-0 lg:w-72 xl:w-80 flex flex-col"
-          style={{ background: '#0D0D10', borderLeft: '1px solid #27272A' }}
+          style={{ background: 'var(--c-surface)', borderLeft: '1px solid var(--c-border)' }}
         >
           {/* Header */}
-          <div className="px-5 pt-5 pb-3" style={{ borderBottom: '1px solid #27272A' }}>
-            <p className="font-mono uppercase" style={{ fontSize: '0.55rem', letterSpacing: '0.2em', color: '#52525B' }}>
+          <div className="px-5 pt-5 pb-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
+            <p className="font-mono uppercase" style={{ fontSize: '0.55rem', letterSpacing: '0.2em', color: 'var(--c-muted)' }}>
               COLOUR GRADE SPECS
             </p>
             {project?.title && (
-              <p className="font-display font-bold mt-1" style={{ fontFamily: "'Syne',sans-serif", fontSize: '1rem', letterSpacing: '0.04em', color: '#E4E4E7' }}>
+              <p className="font-display font-bold mt-1" style={{ fontFamily: "'Syne',sans-serif", fontSize: '1rem', letterSpacing: '0.04em', color: 'var(--c-text)' }}>
                 {project.title}
               </p>
             )}
@@ -255,7 +255,7 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
 
           {/* Node count visual bar */}
           <div className="px-5 pb-5">
-            <p className="font-mono mb-2" style={{ fontSize: '0.5rem', letterSpacing: '0.18em', color: '#52525B', textTransform: 'uppercase' }}>
+            <p className="font-mono mb-2" style={{ fontSize: '0.5rem', letterSpacing: '0.18em', color: 'var(--c-muted)', textTransform: 'uppercase' }}>
               NODE PIPELINE
             </p>
             <div className="flex flex-wrap gap-1">
@@ -285,10 +285,10 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
 function SpecRow({ label, value, accent }) {
   return (
     <div>
-      <p className="font-mono" style={{ fontSize: '0.5rem', letterSpacing: '0.18em', color: '#52525B', textTransform: 'uppercase', marginBottom: 3 }}>
+      <p className="font-mono" style={{ fontSize: '0.5rem', letterSpacing: '0.18em', color: 'var(--c-muted)', textTransform: 'uppercase', marginBottom: 3 }}>
         {label}
       </p>
-      <p className="font-mono" style={{ fontSize: '0.68rem', letterSpacing: '0.04em', color: accent ? '#E2F952' : '#A1A1AA', lineHeight: 1.5 }}>
+      <p className="font-mono font-medium" style={{ fontSize: '0.68rem', letterSpacing: '0.04em', color: accent ? 'var(--c-tally)' : 'var(--c-text)', lineHeight: 1.5 }}>
         {value}
       </p>
     </div>

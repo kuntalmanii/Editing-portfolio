@@ -354,12 +354,12 @@
 }
 
 [data-theme="light"] .contact-sheet-frame {
-  background: #FFFFFF;
-  border-color: #E2E2E8;
+  background: #FFFFFF !important;
+  border-color: #E2E2E8 !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 [data-theme="light"] .contact-sheet-frame:hover {
-  border-color: #0E0E12;
+  border-color: #0E0E12 !important;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
@@ -368,12 +368,12 @@
 }
 
 [data-theme="light"] .card {
-  background: #FFFFFF;
-  border-color: #E2E2E8;
+  background: #FFFFFF !important;
+  border-color: #E2E2E8 !important;
 }
 
 [data-theme="light"] .project-card:hover {
-  border-color: #0E0E12;
+  border-color: #0E0E12 !important;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.06);
 }
 
@@ -384,10 +384,14 @@
   color: #09090B !important;
 }
 
+/* Card and container dark hexes to white */
 [data-theme="light"] .bg-\[\#0B0B0E\],
 [data-theme="light"] .bg-\[\#0E0E12\],
 [data-theme="light"] .bg-\[\#0D0D11\],
+[data-theme="light"] .bg-\[\#0D0D10\],
 [data-theme="light"] .bg-\[\#101015\],
+[data-theme="light"] .bg-\[\#111114\],
+[data-theme="light"] .bg-\[\#111115\],
 [data-theme="light"] .bg-\[\#111116\],
 [data-theme="light"] .bg-\[\#121217\],
 [data-theme="light"] .bg-\[\#131318\],
@@ -397,23 +401,31 @@
   background-color: #FFFFFF !important;
 }
 
+/* Base page backgrounds to clean studio light */
 [data-theme="light"] .bg-\[\#08080A\],
 [data-theme="light"] .bg-\[\#070709\],
 [data-theme="light"] .bg-\[\#09090C\] {
   background-color: #F5F5F7 !important;
 }
 
+/* Inner containers, elevated clips, chips, active selection */
+[data-theme="light"] .bg-\[\#16161F\],
 [data-theme="light"] .bg-\[\#16161E\],
 [data-theme="light"] .bg-\[\#1A1A22\],
 [data-theme="light"] .bg-\[\#181822\],
+[data-theme="light"] .bg-\[\#141418\],
 [data-theme="light"] .bg-\[\#14141A\],
+[data-theme="light"] .bg-\[\#14141B\],
 [data-theme="light"] .bg-\[\#1C1C24\],
+[data-theme="light"] .bg-\[\#1C1C22\],
 [data-theme="light"] .bg-\[\#16161C\],
 [data-theme="light"] .bg-\[\#16161D\],
-[data-theme="light"] .bg-\[\#1F1F28\] {
+[data-theme="light"] .bg-\[\#1F1F28\],
+[data-theme="light"] .bg-\[\#1F1F26\] {
   background-color: #EDEDF2 !important;
 }
 
+/* Borders */
 [data-theme="light"] .border-\[\#27272A\],
 [data-theme="light"] .border-\[\#1E1E24\],
 [data-theme="light"] .border-\[\#1C1C22\],
@@ -422,8 +434,17 @@
   border-color: #E2E2E8 !important;
 }
 
+/* High-contrast text mapping in light mode */
 [data-theme="light"] .text-white {
   color: #09090B !important;
+}
+
+[data-theme="light"] .text-text {
+  color: #09090B !important;
+}
+
+[data-theme="light"] .text-text-dim {
+  color: #475569 !important;
 }
 
 [data-theme="light"] .text-\[\#E4E4E7\],
@@ -440,7 +461,110 @@
 }
 
 [data-theme="light"] .text-\[\#52525B\] {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
+
+/* Hero Portfolio Stroke in light mode */
+[data-theme="light"] .hero-portfolio-stroke {
+  -webkit-text-stroke: 1.5px #09090B !important;
+  color: transparent !important;
+}
+
+/* Hero Radial Vignette in light mode */
+[data-theme="light"] .hero-vignette {
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, transparent 0%, #F5F5F7 80%) !important;
+}
+
+/* Active Filter Pill in light mode */
+[data-theme="light"] .filter-pill-active {
+  background: #09090B !important;
+  color: #FFFFFF !important;
+  border-color: #09090B !important;
+}
+[data-theme="light"] .filter-pill-active .filter-pip {
+  background: #E2F952 !important;
+}
+
+/* Timeline selected clip highlight in light mode */
+[data-theme="light"] .timeline-clip-selected {
+  background-color: #FFFFFF !important;
+  border-color: #09090B !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+[data-theme="light"] .timeline-clip-selected .clip-title {
+  color: #09090B !important;
+}
+
+/* Ensure acid text on white has strong contrast */
+[data-theme="light"] .text-acid {
+  color: #09090B !important;
+}
+
+/* Ensure acid borders in light mode don't wash out */
+[data-theme="light"] .border-acid {
+  border-color: #09090B !important;
+}
+
+[data-theme="light"] .shadow-acid-glow {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ─── Full-Length Site Background Canvas ─────────────────────── */
+.full-site-grid {
+  background-color: var(--c-bg);
+  transition: background-color 0.4s ease;
+}
+
+.full-site-atmosphere {
+  transition: opacity 0.4s ease;
+}
+
+/* Dark Theme Full-Length Blueprint Grid & Atmosphere */
+:root, [data-theme="dark"] {
+  --c-bg: #08080A;
+}
+
+[data-theme="dark"] .full-site-grid {
+  background-color: #08080A;
+  background-image:
+    linear-gradient(rgba(39, 39, 42, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(39, 39, 42, 0.22) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px;
+}
+
+[data-theme="dark"] .full-site-atmosphere {
+  background-image:
+    radial-gradient(ellipse 80% 600px at 50% 0px, rgba(226, 249, 82, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 700px at 90% 38%, rgba(59, 130, 246, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 800px at 10% 80%, rgba(255, 59, 48, 0.025) 0%, transparent 60%);
+  background-repeat: no-repeat;
+}
+
+/* Daylight Studio (Light Mode) Full-Length Architectural Background */
+[data-theme="light"] .full-site-grid {
+  background-color: #F4F4F6;
+  background-image:
+    /* Precision millimeter drafting grid lines */
+    linear-gradient(to right, rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+    /* Precision intersection dot matrix crosshairs */
+    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.09) 1.2px, transparent 0);
+  background-size: 48px 48px, 48px 48px, 48px 48px;
+  background-repeat: repeat, repeat, repeat;
+}
+
+[data-theme="light"] .full-site-atmosphere {
+  background-image:
+    /* Top luminous studio key light flare */
+    radial-gradient(ellipse 85% 700px at 50% 0px, rgba(226, 249, 82, 0.24) 0%, rgba(226, 249, 82, 0.06) 45%, transparent 75%),
+    /* Mid-tier anamorphic cool optical fill (behind Raw Vault) */
+    radial-gradient(ellipse 75% 850px at 95% 36%, rgba(59, 130, 246, 0.07) 0%, transparent 60%),
+    /* Lower studio tally warmth (behind Timeline & Contact) */
+    radial-gradient(ellipse 80% 900px at 5% 78%, rgba(255, 59, 48, 0.05) 0%, transparent 60%),
+    /* Vignette framing on canvas perimeter */
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 70%, rgba(0, 0, 0, 0.03) 100%);
+  background-repeat: no-repeat;
+}
+
 
 

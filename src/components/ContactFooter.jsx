@@ -1,33 +1,42 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Terminal, 
-  Send, 
-  Copy, 
-  Check, 
   Mail, 
   MapPin, 
   Clock, 
-  ExternalLink, 
-  ArrowUp,
+  ArrowUpRight, 
+  ArrowUp, 
+  Check, 
+  Copy, 
+  Send, 
   Sparkles,
-  ShieldCheck,
-  Radio
+  CheckCircle2
 } from 'lucide-react';
 import { siteMeta } from '../data/portfolioData';
 import { playClickSound, playSuccessSound } from '../utils/audioSystem';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ContactFooter
-// Monospace command-line contact terminal + quick-copy email + editorial footer
+// Redesigned with refined editorial UI/UX:
+// - Generous negative space and strong typographic hierarchy
+// - Direct email quick-copy with instant tactile feedback
+// - Clean, frictionless 2-column contact interface
+// - Studio metadata, live timezone, and navigation colophon
 // ─────────────────────────────────────────────────────────────────────────────
+
+const PROJECT_TYPES = [
+  'Commercial TVC',
+  'Narrative / Feature',
+  'Color Grading Only',
+  'Visual Retouching',
+  'Music Video',
+];
 
 export default function ContactFooter() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    scope: 'COMMERCIAL TVC',
-    timeline: 'Q4 2026',
+    projectType: 'Commercial TVC',
     message: '',
   });
 
@@ -36,7 +45,7 @@ export default function ContactFooter() {
   const [isCopied, setIsCopied] = useState(false);
   const [localTime, setLocalTime] = useState('');
 
-  // ── Mumbai Real-time Clock ───────────────────────────────────────────────
+  // Mumbai IST live clock
   useEffect(() => {
     const updateTime = () => {
       try {
@@ -50,7 +59,7 @@ export default function ContactFooter() {
         });
         setLocalTime(ist);
       } catch (e) {
-        setLocalTime('14:35:00');
+        setLocalTime('14:30:00');
       }
     };
     updateTime();
@@ -58,25 +67,27 @@ export default function ContactFooter() {
     return () => clearInterval(interval);
   }, []);
 
-  // ── Quick-copy email handler ─────────────────────────────────────────────
-  const copyEmail = () => {
+  // Quick-copy email handler
+  const copyEmail = useCallback(() => {
     playSuccessSound();
-    navigator.clipboard?.writeText(siteMeta.email);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(siteMeta.email);
+    }
     setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2500);
-  };
+    setTimeout(() => setIsCopied(false), 2400);
+  }, []);
 
-  // ── Terminal Dispatch Submit ─────────────────────────────────────────────
+  // Form submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    playClickSound(1600, 0.06);
+    playClickSound(1500, 0.05);
     setIsSubmitting(true);
 
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSent(true);
       playSuccessSound();
-    }, 1200);
+    }, 900);
   };
 
   const scrollToTop = () => {
@@ -85,319 +96,325 @@ export default function ContactFooter() {
   };
 
   return (
-    <footer id="contact" className="relative pt-24 pb-12 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+    <footer id="contact" className="relative pt-20 sm:pt-28 pb-12 px-5 sm:px-8 md:px-12 max-w-7xl mx-auto">
+      
+      {/* ── Top Header & Direct Action Split ──────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 mb-20 items-start">
+        
+        {/* Left Column: Bold Typographic Callout & Studio Details (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col justify-between">
+          <div>
+            {/* Section Tag */}
+            <div className="flex items-center gap-2 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-tally animate-pulse" />
+              <span className="font-mono text-[0.6875rem] text-[var(--c-muted)] uppercase tracking-widest">
+                DISPATCH // 04 — GET IN TOUCH
+              </span>
+            </div>
 
-      {/* ── Section Header ─────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-tally animate-pulse" />
-            <span className="font-mono text-[0.625rem] text-[#71717A] tracking-widest uppercase">
-              TRANSMISSION TERMINAL // 04
-            </span>
+            {/* Main Display Headline */}
+            <h2
+              className="font-display font-extrabold uppercase leading-[0.94] text-[var(--c-text)] tracking-tight mb-6"
+              style={{
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 'clamp(2.15rem, 4.2vw, 3.6rem)',
+                letterSpacing: '-0.035em',
+              }}
+            >
+              LET’S WORK
+              <br />
+              <span 
+                className="transition-colors duration-300 block"
+                style={{
+                  color: 'var(--c-acid)',
+                }}
+              >
+                TOGETHER.
+              </span>
+            </h2>
+
+            {/* Editorial Sub-copy */}
+            <p className="font-mono text-xs sm:text-sm text-[var(--c-text-dim)] leading-relaxed max-w-md">
+              Available for commercial assemblies, narrative film grades, and digital beauty retouching commissions worldwide. Remote collaboration via Frame.io C2C.
+            </p>
           </div>
 
-          <h2
-            className="font-display font-extrabold text-white"
-            style={{ 
-              fontFamily: "'Syne', sans-serif", 
-              fontSize: 'clamp(2rem, 5vw, 3.5rem)', 
-              letterSpacing: '-0.03em', 
-              lineHeight: 1 
-            }}
-          >
-            DISPATCH & CONTACT
-          </h2>
-
-          <p className="font-mono text-[0.6875rem] text-[#A1A1AA] tracking-wider mt-3 max-w-xl">
-            Open for commercial campaigns, narrative film grades, and digital visual retouching commissions worldwide.
-          </p>
-        </div>
-
-        {/* Quick Email Direct Copy Pill Button */}
-        <div className="flex-none">
-          <button
-            type="button"
-            onClick={copyEmail}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#121217] border border-[#27272A] hover:border-acid/50 transition-all group shadow-lg"
-          >
-            <div className="w-8 h-8 rounded-full bg-acid/10 border border-acid/30 flex items-center justify-center text-acid">
-              <Mail className="w-4 h-4" />
-            </div>
-            <div className="text-left font-mono">
-              <span className="text-[0.5625rem] text-[#71717A] tracking-widest uppercase block">
-                DIRECT INBOX // CLICK TO COPY
-              </span>
-              <span className="text-[0.75rem] text-white font-bold group-hover:text-acid transition-colors">
+          {/* Direct Email Action Tile */}
+          <div className="mt-10 pt-8 border-t border-[var(--c-border)]">
+            <span className="font-mono text-[0.625rem] text-[var(--c-muted)] uppercase tracking-wider block mb-2">
+              DIRECT INBOX // CLICK TO COPY
+            </span>
+            
+            <button
+              type="button"
+              onClick={copyEmail}
+              className="group flex flex-wrap items-center gap-3 text-left transition-all"
+            >
+              <span className="font-mono font-bold text-lg sm:text-2xl text-[var(--c-text)] group-hover:text-acid transition-colors underline underline-offset-4 decoration-[var(--c-border)] group-hover:decoration-acid">
                 {siteMeta.email}
               </span>
-            </div>
-            <div className="ml-2 pl-2 border-l border-[#27272A]">
-              {isCopied ? (
-                <span className="flex items-center gap-1 font-mono text-[0.6rem] text-acid font-bold">
-                  <Check className="w-3.5 h-3.5" />
-                  COPIED
-                </span>
-              ) : (
-                <Copy className="w-3.5 h-3.5 text-[#71717A] group-hover:text-white transition-colors" />
-              )}
-            </div>
-          </button>
-        </div>
-      </div>
+              
+              <span className="inline-flex items-center gap-1.5 font-mono text-[0.6875rem] px-3 py-1 rounded-full bg-[var(--c-surface)] border border-[var(--c-border)] text-[var(--c-text-dim)] group-hover:border-acid group-hover:text-acid transition-all">
+                {isCopied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-acid" />
+                    <span className="font-bold text-acid">COPIED</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>COPY</span>
+                  </>
+                )}
+              </span>
+            </button>
 
-      {/* ── Monospace Command-Line Contact Terminal ────────────────────── */}
-      <div className="rounded-xl bg-[#0B0B0E] border border-[#27272A] overflow-hidden shadow-2xl mb-16">
-        
-        {/* Terminal Title Bar */}
-        <div className="px-4 py-3 bg-[#131318] border-b border-[#27272A] flex items-center justify-between font-mono text-[0.625rem]">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FF3B30] opacity-80" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FF9500] opacity-80" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#34C759] opacity-80" />
-            <span className="text-[#A1A1AA] font-bold ml-2">guest@framerate.studio: ~/send-dispatch.sh</span>
+            {/* Studio Key Metadata Strip */}
+            <div className="mt-8 flex flex-wrap items-center gap-y-2 gap-x-6 font-mono text-xs text-[var(--c-muted)]">
+              <div className="flex items-center gap-1.5 text-[var(--c-text)]">
+                <MapPin className="w-3.5 h-3.5 text-acid" />
+                <span>{siteMeta.location}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-acid" />
+                <span>{localTime} IST</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-acid font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-acid animate-ping" />
+                <span>COMMISSIONS OPEN</span>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 text-[#71717A] hidden sm:flex">
-            <span>TLS 1.3 ENCRYPTED</span>
-            <span>·</span>
-            <span className="text-acid">STATUS: READY</span>
-          </div>
         </div>
 
-        {/* Terminal Body Form */}
-        <div className="p-6 sm:p-8 font-mono">
-          <AnimatePresence mode="wait">
-            {isSent ? (
-              /* Success Terminal State */
-              <motion.div
-                key="dispatch-success"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="py-12 flex flex-col items-center text-center space-y-4"
-              >
-                <div className="w-14 h-14 rounded-full bg-acid/10 border border-acid/40 flex items-center justify-center text-acid shadow-acid-glow">
-                  <ShieldCheck className="w-7 h-7" />
-                </div>
-
-                <div className="space-y-1">
-                  <p className="font-mono text-acid font-bold text-sm tracking-wider">
-                    [200 OK] DISPATCH TRANSMITTED TO {siteMeta.editor.toUpperCase()}
-                  </p>
-                  <p className="text-[0.7rem] text-[#A1A1AA] max-w-md">
-                    Transmission packet securely delivered. Expect an editorial response within 24 hours.
-                  </p>
-                </div>
-
-                <div className="p-3 rounded bg-[#131318] border border-[#27272A] text-[0.625rem] text-[#71717A] space-y-1 text-left max-w-sm w-full">
-                  <div>DISPATCH_ID: #{Math.floor(100000 + Math.random() * 900000)}</div>
-                  <div>SENDER: {formData.email}</div>
-                  <div>SCOPE: [{formData.scope}]</div>
-                  <div>TIMELINE: [{formData.timeline}]</div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsSent(false);
-                    setFormData({ name: '', email: '', scope: 'COMMERCIAL TVC', timeline: 'Q4 2026', message: '' });
-                  }}
-                  className="mt-4 px-4 py-2 rounded bg-[#1A1A22] text-white hover:text-acid border border-[#27272A] text-[0.6875rem] tracking-wider uppercase transition-colors"
+        {/* Right Column: Clean, Frictionless Editorial Form (7 cols, shifted right) */}
+        <div className="lg:col-span-7 lg:pl-6 lg:translate-x-3 xl:translate-x-6">
+          <div className="rounded-2xl p-6 sm:p-8 bg-[var(--c-surface)] border border-[var(--c-border)] shadow-xl transition-colors duration-300">
+            
+            <AnimatePresence mode="wait">
+              {isSent ? (
+                /* Success Confirmation State */
+                <motion.div
+                  key="sent"
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="py-12 text-center flex flex-col items-center justify-center space-y-4"
                 >
-                  TRANSMIT ANOTHER DISPATCH
-                </button>
-              </motion.div>
-            ) : (
-              /* Interactive Command Line Form */
-              <form onSubmit={handleSubmit} className="space-y-6">
-
-                {/* Terminal Prompt Intro */}
-                <div className="text-[0.6875rem] text-[#71717A] space-y-1 border-b border-[#1E1E24] pb-4">
-                  <p className="text-[#A1A1AA]">
-                    <span className="text-acid">manish@framerate:~$</span> cat README_INQUIRIES.txt
-                  </p>
-                  <p className="text-[#71717A]">
-                    Available for high-end color grading, commercial assemblies, narrative post, and RAW retouching. Fill parameters below to transmit project brief.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-                  {/* Field 1: Name */}
-                  <div className="space-y-1.5">
-                    <label className="text-[0.625rem] text-[#71717A] tracking-wider uppercase flex items-center gap-1.5">
-                      <span className="text-acid">$</span> CLIENT_NAME:
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Elena Rostova / Nike EMEA"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded bg-[#121217] border border-[#27272A] text-white text-xs focus:border-acid focus:outline-none focus:ring-1 focus:ring-acid/40 transition-colors placeholder-[#3F3F46]"
-                    />
+                  <div className="w-14 h-14 rounded-full bg-acid/10 border border-acid/40 flex items-center justify-center text-acid shadow-acid-glow">
+                    <CheckCircle2 className="w-7 h-7" />
                   </div>
 
-                  {/* Field 2: Email */}
-                  <div className="space-y-1.5">
-                    <label className="text-[0.625rem] text-[#71717A] tracking-wider uppercase flex items-center gap-1.5">
-                      <span className="text-acid">$</span> CLIENT_EMAIL:
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="e.g. producer@latitude.studio"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded bg-[#121217] border border-[#27272A] text-white text-xs focus:border-acid focus:outline-none focus:ring-1 focus:ring-acid/40 transition-colors placeholder-[#3F3F46]"
-                    />
-                  </div>
-
-                  {/* Field 3: Scope */}
-                  <div className="space-y-1.5">
-                    <label className="text-[0.625rem] text-[#71717A] tracking-wider uppercase flex items-center gap-1.5">
-                      <span className="text-acid">$</span> PROJECT_SCOPE:
-                    </label>
-                    <select
-                      value={formData.scope}
-                      onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded bg-[#121217] border border-[#27272A] text-white text-xs focus:border-acid focus:outline-none focus:ring-1 focus:ring-acid/40 transition-colors"
-                    >
-                      <option value="COMMERCIAL TVC">COMMERCIAL TVC / BRAND IDENTITY</option>
-                      <option value="NARRATIVE SHORT / FEATURE">NARRATIVE SHORT / INDIE FEATURE</option>
-                      <option value="COLOR FINISH / ACES PIPELINE">COLOR FINISHING (ACES / HDR10+)</option>
-                      <option value="DIGITAL BEAUTY RETOUCH">DIGITAL BEAUTY & RETOUCH STILLS</option>
-                      <option value="DOCUMENTARY POST">DOCUMENTARY EPISODIC</option>
-                    </select>
-                  </div>
-
-                  {/* Field 4: Timeline */}
-                  <div className="space-y-1.5">
-                    <label className="text-[0.625rem] text-[#71717A] tracking-wider uppercase flex items-center gap-1.5">
-                      <span className="text-acid">$</span> ESTIMATED_DELIVERY:
-                    </label>
-                    <select
-                      value={formData.timeline}
-                      onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded bg-[#121217] border border-[#27272A] text-white text-xs focus:border-acid focus:outline-none focus:ring-1 focus:ring-acid/40 transition-colors"
-                    >
-                      <option value="IMMEDIATE / RUSH">IMMEDIATE / RUSH (WITHIN 2 WEEKS)</option>
-                      <option value="Q4 2026">Q4 2026 SCHEDULE</option>
-                      <option value="Q1 2027">Q1 2027 PRODUCTION</option>
-                      <option value="FLEXIBLE ARCHIVE">FLEXIBLE / TBD</option>
-                    </select>
-                  </div>
-
-                </div>
-
-                {/* Field 5: Message */}
-                <div className="space-y-1.5">
-                  <label className="text-[0.625rem] text-[#71717A] tracking-wider uppercase flex items-center gap-1.5">
-                    <span className="text-acid">$</span> DISPATCH_PAYLOAD (BRIEF / RESOLUTION / CAMERAS):
-                  </label>
-                  <textarea
-                    rows={4}
-                    required
-                    placeholder="Enter production details: camera systems (e.g. ARRI Alexa 35 / Sony Venice), deliverables, expected total run-time, and reference look..."
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded bg-[#121217] border border-[#27272A] text-white text-xs focus:border-acid focus:outline-none focus:ring-1 focus:ring-acid/40 transition-colors placeholder-[#3F3F46] resize-none"
-                  />
-                </div>
-
-                {/* Submit Action Bar */}
-                <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-[#1E1E24]">
-                  <div className="flex items-center gap-2 text-[0.6rem] text-[#71717A]">
-                    <Radio className="w-3.5 h-3.5 text-acid animate-pulse" />
-                    <span>CARRIER: ENCRYPTED HTTPS DISPATCH PROTOCOL</span>
+                  <div className="space-y-1">
+                    <h3 className="font-display font-bold text-xl text-[var(--c-text)]">
+                      DISPATCH RECEIVED
+                    </h3>
+                    <p className="font-mono text-xs text-[var(--c-text-dim)] max-w-sm mx-auto">
+                      Thank you for reaching out. Your project brief has been sent to Manish Kuntal. Expect a response within 24 hours.
+                    </p>
                   </div>
 
                   <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-acid text-black font-mono text-xs font-bold tracking-wider uppercase hover:bg-white transition-all shadow-acid-glow disabled:opacity-50"
+                    type="button"
+                    onClick={() => {
+                      playClickSound(1200, 0.04);
+                      setIsSent(false);
+                      setFormData({ name: '', email: '', projectType: 'Commercial TVC', message: '' });
+                    }}
+                    className="mt-4 px-5 py-2.5 rounded-xl bg-[var(--c-surface-inner)] border border-[var(--c-border)] hover:border-acid text-xs font-mono text-[var(--c-text)] hover:text-acid transition-all"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <span className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                        <span>ENCRYPTING & TRANSMITTING...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-3.5 h-3.5" />
-                        <span>EXECUTE TRANSMISSION // SEND</span>
-                      </>
-                    )}
+                    SEND ANOTHER MESSAGE
                   </button>
-                </div>
+                </motion.div>
+              ) : (
+                /* Standard Clean Editorial Form */
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  
+                  <div className="flex items-center justify-between pb-2 border-b border-[var(--c-border)]">
+                    <span className="font-mono text-xs font-bold text-[var(--c-text)]">
+                      PROJECT INQUIRY FORM
+                    </span>
+                    <span className="font-mono text-[0.625rem] text-[var(--c-muted)]">
+                      FAST RESPONSE &lt; 24H
+                    </span>
+                  </div>
 
-              </form>
-            )}
-          </AnimatePresence>
+                  {/* Name & Email Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
+                    <div>
+                      <label className="block font-mono text-[0.6875rem] text-[var(--c-text-dim)] uppercase tracking-wider mb-2">
+                        Your Name / Company *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Alex Morgan / Nike"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-[var(--c-surface-inner)] border border-[var(--c-border)] text-[var(--c-text)] text-xs sm:text-sm focus:outline-none focus:border-acid focus:ring-1 focus:ring-acid/40 transition-colors placeholder-[var(--c-muted)] font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-mono text-[0.6875rem] text-[var(--c-text-dim)] uppercase tracking-wider mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="alex@company.com"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-[var(--c-surface-inner)] border border-[var(--c-border)] text-[var(--c-text)] text-xs sm:text-sm focus:outline-none focus:border-acid focus:ring-1 focus:ring-acid/40 transition-colors placeholder-[var(--c-muted)] font-mono"
+                      />
+                    </div>
+
+                  </div>
+
+                  {/* Project Type Selector */}
+                  <div>
+                    <label className="block font-mono text-[0.6875rem] text-[var(--c-text-dim)] uppercase tracking-wider mb-2">
+                      Scope / Category
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {PROJECT_TYPES.map((type) => {
+                        const isSelected = formData.projectType === type;
+                        return (
+                          <button
+                            key={type}
+                            type="button"
+                            onClick={() => {
+                              playClickSound(1400, 0.03);
+                              setFormData({ ...formData, projectType: type });
+                            }}
+                            className={`px-3 py-2.5 rounded-xl text-xs font-mono text-center border transition-all truncate ${
+                              isSelected
+                                ? 'bg-acid text-black border-acid font-bold shadow-acid-glow filter-pill-active'
+                                : 'bg-[var(--c-surface-inner)] text-[var(--c-text-dim)] border-[var(--c-border)] hover:border-[var(--c-text-dim)] hover:text-[var(--c-text)]'
+                            }`}
+                          >
+                            {type}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Project Brief */}
+                  <div>
+                    <label className="block font-mono text-[0.6875rem] text-[var(--c-text-dim)] uppercase tracking-wider mb-2">
+                      Project Brief & Timeline *
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      placeholder="Tell me about your project: timeline, camera systems, deliverables, and any references..."
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl bg-[var(--c-surface-inner)] border border-[var(--c-border)] text-[var(--c-text)] text-xs sm:text-sm focus:outline-none focus:border-acid focus:ring-1 focus:ring-acid/40 transition-colors placeholder-[var(--c-muted)] font-mono resize-none"
+                    />
+                  </div>
+
+                  {/* Submit Action */}
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3.5 px-6 rounded-xl bg-acid text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white transition-all shadow-acid-glow flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                          <span>SENDING INQUIRY...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-3.5 h-3.5" />
+                          <span>TRANSMIT BRIEF // SEND</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                </form>
+              )}
+            </AnimatePresence>
+
+          </div>
         </div>
 
       </div>
 
-      {/* ── Sub-Footer Editorial Telemetry & Socials ──────────────────── */}
-      <div className="pt-8 border-t border-[#27272A] flex flex-col md:flex-row items-center justify-between gap-6 font-mono text-[0.6875rem] text-[#71717A]">
+      {/* ── Bottom Colophon & Navigation ──────────────────────────────────── */}
+      <div className="pt-10 border-t border-[var(--c-border)] flex flex-col md:flex-row items-center justify-between gap-6 font-mono text-xs text-[var(--c-muted)]">
         
-        {/* Editor signature & location */}
-        <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-          <div className="flex items-center gap-2 text-white font-bold">
+        {/* Brand identity & editor */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 text-[var(--c-text)] font-bold">
             <span className="w-2 h-2 rounded-full bg-tally animate-pulse" />
             <span>{siteMeta.name}</span>
           </div>
           <span>·</span>
-          <span>{siteMeta.editor}</span>
-          <span>·</span>
-          <span className="flex items-center gap-1 text-[#A1A1AA]">
-            <MapPin className="w-3 h-3 text-acid" />
-            {siteMeta.location}
-          </span>
-          <span>·</span>
-          <span className="flex items-center gap-1 text-acid font-semibold">
-            <Clock className="w-3 h-3" />
-            {localTime} IST
-          </span>
+          <span className="text-[var(--c-text-dim)]">{siteMeta.editor}</span>
+          <span className="hidden sm:inline">·</span>
+          <span className="hidden sm:inline text-[var(--c-muted)]">Color & Editorial Finishing Suite</span>
         </div>
 
-        {/* Social Links */}
+        {/* Social Links with Hover Arrow */}
         <div className="flex items-center gap-6">
-          <a
-            href={siteMeta.socials.vimeo}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#A1A1AA] hover:text-white transition-colors relative py-0.5 group"
-          >
-            <span>VIMEO</span>
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-acid transition-all duration-200 group-hover:w-full" />
-          </a>
-          <a
-            href={siteMeta.socials.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#A1A1AA] hover:text-white transition-colors relative py-0.5 group"
-          >
-            <span>INSTAGRAM</span>
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-acid transition-all duration-200 group-hover:w-full" />
-          </a>
-          <a
-            href={siteMeta.socials.behance}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#A1A1AA] hover:text-white transition-colors relative py-0.5 group"
-          >
-            <span>BEHANCE</span>
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-acid transition-all duration-200 group-hover:w-full" />
-          </a>
+          {siteMeta.socials?.vimeo && (
+            <a 
+              href={siteMeta.socials.vimeo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--c-text-dim)] hover:text-acid transition-colors flex items-center gap-1 group"
+            >
+              <span>VIMEO</span>
+              <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+          {siteMeta.socials?.instagram && (
+            <a 
+              href={siteMeta.socials.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--c-text-dim)] hover:text-acid transition-colors flex items-center gap-1 group"
+            >
+              <span>INSTAGRAM</span>
+              <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+          {siteMeta.socials?.behance && (
+            <a 
+              href={siteMeta.socials.behance}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--c-text-dim)] hover:text-acid transition-colors flex items-center gap-1 group"
+            >
+              <span>BEHANCE</span>
+              <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+          {siteMeta.socials?.linkedin && (
+            <a 
+              href={siteMeta.socials.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--c-text-dim)] hover:text-acid transition-colors flex items-center gap-1 group"
+            >
+              <span>LINKEDIN</span>
+              <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
 
           {/* Back to top button */}
           <button
             type="button"
             onClick={scrollToTop}
             title="Back to Top"
-            className="flex items-center gap-1 text-[#71717A] hover:text-acid transition-colors ml-2 pl-4 border-l border-[#27272A]"
+            className="flex items-center gap-1 text-[var(--c-text-dim)] hover:text-acid transition-colors ml-2 pl-4 border-l border-[var(--c-border)]"
           >
             <span>TOP</span>
             <ArrowUp className="w-3.5 h-3.5" />
@@ -406,9 +423,9 @@ export default function ContactFooter() {
 
       </div>
 
-      {/* ── System Credits ────────────────────────────────────────────── */}
-      <div className="mt-8 text-center text-[#52525B] font-mono text-[0.5625rem] tracking-widest uppercase">
-        © 2026 {siteMeta.editor.toUpperCase()} · COLOR FINISH & EDITORIAL SUITE · ACES 2065-1 ARCHIVE · SMPTE TIMECODE SYNC
+      {/* Legal sub-line */}
+      <div className="mt-6 text-center md:text-left text-[0.625rem] text-[var(--c-muted)] font-mono">
+        © 2026 {siteMeta.editor.toUpperCase()} · ACES 2065-1 COLOR PIPELINE · ALL RIGHTS RESERVED
       </div>
 
     </footer>

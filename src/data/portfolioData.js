@@ -574,11 +574,13 @@ export const siteMeta = {
   tagline: "Video Editor · Visual Retoucher",
   location: "Mumbai → Global",
   commissionStatus: "OPEN",
-  email: "manish@framerate.studio",
+  email: "manishkuntal0012@gmail.com",
   socials: {
     instagram: "https://instagram.com/framerate",
     vimeo: "https://vimeo.com/framerate",
     behance: "https://behance.net/framerate",
+    youtube: "https://youtube.com/@framerate",
+    linkedin: "https://linkedin.com/in/manishkuntal",
   },
   navLinks: [
     { label: "WORK", href: "#work" },

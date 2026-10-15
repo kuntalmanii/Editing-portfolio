@@ -18,29 +18,9 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative min-h-[90vh] md:min-h-screen flex flex-col justify-between overflow-hidden"
+      className="relative min-h-[90vh] md:min-h-screen flex flex-col justify-between"
       style={{ paddingTop: '80px' }}
     >
-      {/* ── Background grid ─────────────────────────────────── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(39,39,42,0.18) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(39,39,42,0.18) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
-        }}
-      />
-
-      {/* ── Radial vignette ─────────────────────────────────── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse 80% 60% at 50% 100%, transparent 0%, #08080A 80%)',
-        }}
-      />
-
       {/* ── Hero text ───────────────────────────────────────── */}
       <div className="relative z-10 px-5 sm:px-8 md:pl-10 md:pr-6 lg:pl-12 lg:pr-8 max-w-7xl w-full mr-auto my-auto pt-12 sm:pt-16 md:pt-20 pb-6">
         <motion.div 
@@ -70,8 +50,9 @@ export default function HeroSection() {
             EDITING
             <br />
             <span
+              className="hero-portfolio-stroke"
               style={{
-                WebkitTextStroke: '1px rgba(226,249,82,0.5)',
+                WebkitTextStroke: '1px rgba(226,249,82,0.6)',
                 color: 'transparent',
               }}
             >
@@ -116,22 +97,39 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* ── Scrolling ticker ────────────────────────────────── */}
-      <div
-        className="relative z-10 mt-auto overflow-hidden border-t border-b border-border py-3"
-        style={{ background: 'rgba(17,17,20,0.6)' }}
-      >
-        <div className="ticker-track">
-          {tickerContent.map((item, i) => (
-            <span
-              key={i}
-              className="font-mono uppercase whitespace-nowrap px-8 text-text-dim"
-              style={{ fontSize: '0.6875rem', letterSpacing: '0.18em' }}
-            >
-              {item}
-              <span className="inline-block w-1 h-1 rounded-full bg-tally mx-8 translate-y-px" />
-            </span>
-          ))}
+      {/* ── Contained Precision Telemetry Capsule (Centered) ── */}
+      <div className="relative z-10 mt-auto pb-6 sm:pb-8 px-5 sm:px-8 max-w-7xl w-full mx-auto flex justify-center">
+        <div 
+          className="flex items-center rounded-xl sm:rounded-full bg-[var(--c-surface)]/85 backdrop-blur-md border border-[var(--c-border)] shadow-lg overflow-hidden py-2 px-3 sm:px-4 w-full max-w-2xl sm:max-w-3xl md:max-w-4xl mx-auto"
+        >
+          {/* Fixed Leading Telemetry Label */}
+          <div className="flex-none flex items-center gap-2 pr-3 sm:pr-4 border-r border-[var(--c-border)] font-mono text-[0.625rem] text-[var(--c-text)] font-bold tracking-wider uppercase select-none">
+            <span className="w-1.5 h-1.5 rounded-full bg-tally animate-pulse" />
+            <span className="hidden sm:inline">SUITE SPECS //</span>
+            <span className="sm:hidden">SPECS</span>
+          </div>
+
+          {/* Smooth Fade-Masked Ticker Track */}
+          <div 
+            className="flex-1 overflow-hidden relative"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+            }}
+          >
+            <div className="ticker-track">
+              {tickerContent.map((item, i) => (
+                <span
+                  key={i}
+                  className="font-mono uppercase whitespace-nowrap px-4 sm:px-6 text-[var(--c-text-dim)]"
+                  style={{ fontSize: '0.625rem', letterSpacing: '0.16em' }}
+                >
+                  {item}
+                  <span className="inline-block w-1 h-1 rounded-full bg-acid mx-4 sm:mx-6 translate-y-[-1px] opacity-80" />
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
