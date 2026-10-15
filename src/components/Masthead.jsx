@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { motion, AnimatePresence, LayoutGroup, useScroll, useSpring } from 'framer-motion';
 import { 
   Volume2, 
   VolumeX, 
@@ -45,12 +45,33 @@ export default function Masthead() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [audioActive, setAudioActive] = useState(isAudioEnabled());
   const [currentTheme, setCurrentTheme] = useState(getTheme());
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [timecodeMode, setTimecodeMode] = useState('SMPTE'); // 'SMPTE', 'FRAMES', 'CLOCK'
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [localClock, setLocalClock] = useState('');
   const [isHoveringLogo, setIsHoveringLogo] = useState(false);
+
+  // ── Hardware-Accelerated Scroll Progress (Zero React Re-renders) ──────────
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 140,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
+  // Track if user clicked a nav tab to suppress scroll-spy during smooth scroll
+  const isClickScrollingRef = useRef(false);
+  const clickTimeoutRef = useRef(null);
+
+  const handleNavClick = (id) => {
+    playClickSound(1300, 0.04);
+    setActiveSection(id);
+    isClickScrollingRef.current = true;
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    clickTimeoutRef.current = setTimeout(() => {
+      isClickScrollingRef.current = false;
+    }, 850);
+  };
 
   // ── Timecode formatting ──────────────────────────────────────────────────
   const tcParts = timecode.split(':');
@@ -93,17 +114,19 @@ export default function Masthead() {
     setCurrentTheme(next);
   };
 
-  // ── Scroll Progress & Scrolled State ──────────────────────────────────────
+  // ── Scrolled Threshold State (Header Elevation & Scale) ───────────────────
   useEffect(() => {
+    let lastScrolled = false;
     const onScroll = () => {
-      const scrollY = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
-      setScrollProgress(progress);
-      setIsScrolled(scrollY > 25);
+      const isScrolledNow = window.scrollY > 25;
+      if (isScrolledNow !== lastScrolled) {
+        lastScrolled = isScrolledNow;
+        setIsScrolled(isScrolledNow);
+      }
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -128,27 +151,72 @@ export default function Masthead() {
     return () => clearInterval(id);
   }, []);
 
-  // ── Active Section Scroll-Spy ────────────────────────────────────────────
+  // ── Deterministic, Flicker-Free Scroll-Spy ────────────────────────────────
   useEffect(() => {
-    const sectionElements = NAV_ITEMS.map(s => document.getElementById(s.id)).filter(Boolean);
-    if (!sectionElements.length) return;
+    let ticking = false;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: '-25% 0px -50% 0px',
-        threshold: 0,
+    const checkActiveSection = () => {
+      // If user recently clicked a nav tab, don't override the tab during smooth scrolling
+      if (isClickScrollingRef.current) {
+        ticking = false;
+        return;
       }
-    );
 
-    sectionElements.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      // 1. Near the very top of the page (Hero Section), cleanly default to first item ('work')
+      if (scrollY < 220) {
+        setActiveSection('work');
+        ticking = false;
+        return;
+      }
+
+      // 2. Near the bottom of the page, activate 'contact'
+      if (windowHeight + scrollY >= documentHeight - 120) {
+        setActiveSection('contact');
+        ticking = false;
+        return;
+      }
+
+      // 3. Focal trigger line: 36% down the viewport (where content naturally centers)
+      const focalLine = scrollY + (windowHeight * 0.36);
+
+      let currentId = 'work';
+      for (const item of NAV_ITEMS) {
+        const el = document.getElementById(item.id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const elementDocTop = rect.top + scrollY;
+          if (elementDocTop <= focalLine) {
+            currentId = item.id;
+          }
+        }
+      }
+
+      setActiveSection(prev => (prev !== currentId ? currentId : prev));
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(checkActiveSection);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    
+    // Initial evaluation
+    checkActiveSection();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    };
   }, []);
 
   // ── Lock body scroll when mobile menu is open ────────────────────────────
@@ -270,10 +338,7 @@ export default function Masthead() {
                         playClickSound(1800, 0.02);
                         setHoveredNav(sec.id);
                       }}
-                      onClick={() => {
-                        playClickSound(1300, 0.04);
-                        setActiveSection(sec.id);
-                      }}
+                      onClick={() => handleNavClick(sec.id)}
                       className={`relative px-4 py-1.5 rounded-full font-mono text-xs uppercase tracking-wider transition-colors z-10 select-none ${
                         isHighlighted ? 'text-black font-bold' : 'text-[var(--c-text-dim)] hover:text-[var(--c-text)]'
                       }`}
@@ -283,15 +348,12 @@ export default function Masthead() {
                         <motion.div
                           layoutId="dynamicNavGlidingPill"
                           className="absolute inset-0 rounded-full bg-acid shadow-acid-glow"
-                          transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                         />
                       )}
                       
-                      <span className="relative z-10 flex items-center gap-1.5">
+                      <span className="relative z-10 flex items-center justify-center">
                         {sec.label}
-                        {isCurrentActive && !isHighlighted && (
-                          <span className="w-1 h-1 rounded-full bg-acid animate-ping" />
-                        )}
                       </span>
                     </a>
                   );
@@ -387,9 +449,8 @@ export default function Masthead() {
           {/* ── Integrated Luminous Scroll Progress Line ─────────────────── */}
           <div className="h-[1.5px] w-full bg-[var(--c-border)]/40 overflow-hidden">
             <motion.div
-              className="h-full bg-acid shadow-acid-glow"
-              style={{ width: `${scrollProgress}%` }}
-              transition={{ ease: 'linear', duration: 0.05 }}
+              className="h-full bg-acid shadow-acid-glow origin-left"
+              style={{ scaleX }}
             />
           </div>
 
@@ -443,8 +504,7 @@ export default function Masthead() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.06 * idx, duration: 0.25 }}
                     onClick={() => {
-                      playClickSound(1400, 0.04);
-                      setActiveSection(sec.id);
+                      handleNavClick(sec.id);
                       setMenuOpen(false);
                     }}
                     className={`font-display font-extrabold tracking-tight transition-colors text-3xl ${
