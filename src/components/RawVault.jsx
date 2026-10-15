@@ -23,7 +23,7 @@ import ExifDrawer from './ExifDrawer';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function RawVault() {
-  const [activeFolderId, setActiveFolderId] = useState('folder-01');
+  const [activeFolderId, setActiveFolderId] = useState(rawVaultFolders[0]?.id || 'folder-personal');
   const [isTreeCollapsed, setIsTreeCollapsed] = useState(false);
   const [selectedStillIndex, setSelectedStillIndex] = useState(null);
 
