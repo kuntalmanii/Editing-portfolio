@@ -1,6 +1,7 @@
 import Masthead from './components/Masthead';
 import HeroSection from './components/HeroSection';
 import ProjectReelGrid from './components/ProjectReelGrid';
+import RawVault from './components/RawVault';
 
 export default function App() {
   return (
@@ -15,7 +16,10 @@ export default function App() {
           <ProjectReelGrid />
         </div>
 
-        {/* Phase 3+ sections appended here */}
+        {/* ─── The RAW Vault ───────────────────────────────────── */}
+        <div style={{ borderTop: '1px solid #27272A' }}>
+          <RawVault />
+        </div>
       </main>
     </div>
   );
