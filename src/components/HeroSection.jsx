@@ -18,8 +18,8 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative min-h-screen flex flex-col justify-end pb-16 overflow-hidden"
-      style={{ paddingTop: '88px' }}
+      className="relative min-h-[90vh] md:min-h-screen flex flex-col justify-between overflow-hidden"
+      style={{ paddingTop: '80px' }}
     >
       {/* ── Background grid ─────────────────────────────────── */}
       <div
@@ -42,8 +42,13 @@ export default function HeroSection() {
       />
 
       {/* ── Hero text ───────────────────────────────────────── */}
-      <div className="relative z-10 px-5 md:px-8 max-w-7xl mx-auto w-full">
-        <motion.div variants={STAGGER} initial="hidden" animate="show">
+      <div className="relative z-10 px-5 sm:px-8 md:pl-10 md:pr-6 lg:pl-12 lg:pr-8 max-w-7xl w-full mr-auto my-auto pt-12 sm:pt-16 md:pt-20 pb-6">
+        <motion.div 
+          variants={STAGGER} 
+          initial="hidden" 
+          animate="show"
+          className="mt-1 sm:mt-2 md:mt-4"
+        >
 
           {/* Section tag */}
           <motion.p variants={FADE_UP} className="section-label mb-6 flex items-center gap-3">
@@ -113,7 +118,7 @@ export default function HeroSection() {
 
       {/* ── Scrolling ticker ────────────────────────────────── */}
       <div
-        className="relative z-10 mt-14 overflow-hidden border-t border-b border-border py-3"
+        className="relative z-10 mt-auto overflow-hidden border-t border-b border-border py-3"
         style={{ background: 'rgba(17,17,20,0.6)' }}
       >
         <div className="ticker-track">

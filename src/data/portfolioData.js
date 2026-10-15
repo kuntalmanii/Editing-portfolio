@@ -132,7 +132,7 @@ export const videoProjects = [
     },
     softwareStack: ["DaVinci Resolve 19", "Nuke", "After Effects", "Pro Tools"],
     deliverables: ["DCP Cinema", "Rec.709 Festival", "Vimeo 4K"],
-    director: "Arjun Mehta",
+    director: "Manish Kuntal",
     dop: "Tanvir Hassan",
   },
   {
@@ -570,11 +570,11 @@ export const FILTER_TABS = ["ALL", "COMMERCIAL", "DOCUMENTARY", "EDITORIAL", "NA
 // ─── SITE META ────────────────────────────────────────────────────────────────
 export const siteMeta = {
   name: "FRAME.RATE",
-  editor: "Arjun Mehta",
+  editor: "Manish Kuntal",
   tagline: "Video Editor · Visual Retoucher",
   location: "Mumbai → Global",
   commissionStatus: "OPEN",
-  email: "arjun@framerate.studio",
+  email: "manish@framerate.studio",
   socials: {
     instagram: "https://instagram.com/framerate",
     vimeo: "https://vimeo.com/framerate",

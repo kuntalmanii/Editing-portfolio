@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Play, Pause, ExternalLink, Clock, Film, Monitor } from 'lucide-react';
 import BeforeAfterViewer from './BeforeAfterViewer';
+import { siteMeta } from '../data/portfolioData';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ProjectModal
@@ -400,8 +401,8 @@ function ProjectTab({ project }) {
           {[
             ['Director', project.director],
             ['DOP',      project.dop],
-            ['Editor',   'Arjun Mehta'],
-            ['Colourist','Arjun Mehta'],
+            ['Editor',   siteMeta.editor],
+            ['Colourist',siteMeta.editor],
           ].filter(([,v]) => v).map(([k, v]) => <ModalMetaRow key={k} label={k} value={v} />)}
         </div>
 

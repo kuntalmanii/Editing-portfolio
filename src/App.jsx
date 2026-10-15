@@ -8,7 +8,7 @@ import CustomCursor from './components/CustomCursor';
 
 export default function App() {
   return (
-    <div className="grain min-h-screen relative" style={{ background: '#08080A' }}>
+    <div className="grain min-h-screen relative transition-colors duration-300" style={{ background: 'var(--c-bg)', color: 'var(--c-text)' }}>
       {/* Precision custom cursor follower */}
       <CustomCursor />
 
@@ -20,23 +20,23 @@ export default function App() {
         <HeroSection />
 
         {/* ─── Dynamic Edits Deck ──────────────────────────────── */}
-        <div style={{ borderTop: '1px solid #27272A' }}>
+        <div style={{ borderTop: '1px solid var(--c-border)' }}>
           <ProjectReelGrid />
         </div>
 
         {/* ─── The RAW Vault ───────────────────────────────────── */}
-        <div style={{ borderTop: '1px solid #27272A' }}>
+        <div style={{ borderTop: '1px solid var(--c-border)' }}>
           <RawVault />
         </div>
 
         {/* ─── NLE Timeline Resume ─────────────────────────────── */}
-        <div style={{ borderTop: '1px solid #27272A' }}>
+        <div style={{ borderTop: '1px solid var(--c-border)' }}>
           <TimelineResume />
         </div>
       </main>
 
       {/* ─── Command-Line Contact & System Footer ──────────────── */}
-      <div style={{ borderTop: '1px solid #27272A' }}>
+      <div style={{ borderTop: '1px solid var(--c-border)' }}>
         <ContactFooter />
       </div>
     </div>

@@ -183,7 +183,7 @@ export default function ContactFooter() {
 
                 <div className="space-y-1">
                   <p className="font-mono text-acid font-bold text-sm tracking-wider">
-                    [200 OK] DISPATCH TRANSMITTED TO ARJUN MEHTA
+                    [200 OK] DISPATCH TRANSMITTED TO {siteMeta.editor.toUpperCase()}
                   </p>
                   <p className="text-[0.7rem] text-[#A1A1AA] max-w-md">
                     Transmission packet securely delivered. Expect an editorial response within 24 hours.
@@ -215,7 +215,7 @@ export default function ContactFooter() {
                 {/* Terminal Prompt Intro */}
                 <div className="text-[0.6875rem] text-[#71717A] space-y-1 border-b border-[#1E1E24] pb-4">
                   <p className="text-[#A1A1AA]">
-                    <span className="text-acid">arjun@framerate:~$</span> cat README_INQUIRIES.txt
+                    <span className="text-acid">manish@framerate:~$</span> cat README_INQUIRIES.txt
                   </p>
                   <p className="text-[#71717A]">
                     Available for high-end color grading, commercial assemblies, narrative post, and RAW retouching. Fill parameters below to transmit project brief.
@@ -408,7 +408,7 @@ export default function ContactFooter() {
 
       {/* ── System Credits ────────────────────────────────────────────── */}
       <div className="mt-8 text-center text-[#52525B] font-mono text-[0.5625rem] tracking-widest uppercase">
-        © 2026 ARJUN MEHTA · COLOR FINISH & EDITORIAL SUITE · ACES 2065-1 ARCHIVE · SMPTE TIMECODE SYNC
+        © 2026 {siteMeta.editor.toUpperCase()} · COLOR FINISH & EDITORIAL SUITE · ACES 2065-1 ARCHIVE · SMPTE TIMECODE SYNC
       </div>
 
     </footer>

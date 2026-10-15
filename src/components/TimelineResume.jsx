@@ -203,7 +203,7 @@ export default function TimelineResume() {
         <div className="flex flex-wrap items-center gap-2 font-mono text-[0.625rem]">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#111116] border border-[#27272A] text-[#A1A1AA]">
             <Film className="w-3.5 h-3.5 text-acid" />
-            <span>SEQ: ARJUN_CAREER_CONFORM.drp</span>
+            <span>SEQ: MANISH_CAREER_CONFORM.drp</span>
           </div>
 
           {/* Live Scrubber Readout */}
