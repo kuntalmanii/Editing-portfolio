@@ -1,21 +1,48 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { Play, Clock, ExternalLink, ChevronRight } from 'lucide-react';
+import { Play, Clock, ExternalLink, ChevronRight, ChevronDown } from 'lucide-react';
 import { videoProjects, FILTER_TABS } from '../data/portfolioData';
+import { playClickSound } from '../utils/audioSystem';
 import ProjectModal from './ProjectModal';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ProjectReelGrid
-// Filter bar → animated card grid → modal on click
+// Filter bar → animated card grid → Show More expander → modal on click
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function ProjectReelGrid() {
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [showAll, setShowAll] = useState(false);
+
+  // Reset showAll when switching filter tabs
+  useEffect(() => {
+    setShowAll(false);
+  }, [activeFilter]);
+
+  const INITIAL_COUNT = 3;
 
   const filtered = activeFilter === 'ALL'
     ? videoProjects
     : videoProjects.filter((p) => p.category === activeFilter);
+
+  const visibleProjects = showAll ? filtered : filtered.slice(0, INITIAL_COUNT);
+  const hasMore = filtered.length > INITIAL_COUNT;
+  const remainingCount = filtered.length - INITIAL_COUNT;
+
+  const handleToggleShowMore = () => {
+    playClickSound(1400, 0.04);
+    setShowAll(prev => {
+      const next = !prev;
+      if (!next) {
+        const el = document.getElementById('work');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+      return next;
+    });
+  };
 
   return (
     <section id="work" className="relative py-20 px-5 md:px-8 max-w-7xl mx-auto">
@@ -35,7 +62,7 @@ export default function ProjectReelGrid() {
           </h2>
         </div>
         <p className="font-mono" style={{ fontSize: '0.65rem', letterSpacing: '0.06em', color: '#52525B' }}>
-          {filtered.length} / {videoProjects.length} projects
+          {visibleProjects.length} / {filtered.length} projects shown
         </p>
       </div>
 
@@ -61,7 +88,7 @@ export default function ProjectReelGrid() {
           className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-start"
         >
           <AnimatePresence mode="popLayout">
-            {filtered.map((project, idx) => (
+            {visibleProjects.map((project, idx) => (
               <ProjectCard
                 key={project.id}
                 project={project}
@@ -72,6 +99,40 @@ export default function ProjectReelGrid() {
           </AnimatePresence>
         </motion.div>
       </LayoutGroup>
+
+      {/* ── Show More / Show Less Action ───────────────────────────────── */}
+      {hasMore && (
+        <div className="flex flex-col items-center justify-center mt-12 pt-2">
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleToggleShowMore}
+            className="group relative flex items-center gap-3 px-8 py-3.5 rounded-full font-mono text-xs uppercase tracking-widest border border-[var(--c-border)] bg-[var(--c-surface)] hover:border-acid hover:bg-[var(--c-surface-inner)] text-[var(--c-text)] transition-all shadow-xl select-none"
+            aria-label={showAll ? "Collapse extra reels" : "Show more video projects"}
+          >
+            {/* Live pulsing pip */}
+            <span className="w-2 h-2 rounded-full bg-acid animate-pulse" />
+            
+            <span className="font-bold">
+              {showAll ? 'COLLAPSE REELS' : `SHOW MORE EDITS (+${remainingCount})`}
+            </span>
+
+            <ChevronDown 
+              className={`w-4 h-4 text-acid transition-transform duration-300 ${
+                showAll ? 'rotate-180' : 'group-hover:translate-y-0.5'
+              }`} 
+            />
+          </motion.button>
+
+          <p className="font-mono text-[0.625rem] text-[var(--c-muted)] mt-3 tracking-wider uppercase">
+            {showAll 
+              ? `Displaying all ${filtered.length} cuts & archive projects` 
+              : `Showing top ${INITIAL_COUNT} flagship cuts · ${remainingCount} additional cuts available`
+            }
+          </p>
+        </div>
+      )}
 
       {/* ── Project modal ──────────────────────────────────────────────── */}
       <AnimatePresence>
