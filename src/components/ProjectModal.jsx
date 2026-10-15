@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, ExternalLink, Clock, Film, Monitor } from 'lucide-react';
+import { X, Play, Pause, ExternalLink, Clock, Film, Monitor, Volume2, VolumeX } from 'lucide-react';
 import BeforeAfterViewer from './BeforeAfterViewer';
 import { siteMeta } from '../data/portfolioData';
 
@@ -26,6 +26,7 @@ export default function ProjectModal({ project, onClose }) {
   const [scrubPct, setScrubPct] = useState(0);
   const [activeTab, setActiveTab] = useState('GRADE');
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef(null);
   const scrubRef = useRef(null);
   const rafRef = useRef(null);
@@ -76,6 +77,15 @@ export default function ProjectModal({ project, onClose }) {
       setIsVideoPlaying(false);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     }
+  };
+
+  const toggleMute = (e) => {
+    e?.stopPropagation();
+    const vid = videoRef.current;
+    if (!vid) return;
+    const nextMuted = !vid.muted;
+    vid.muted = nextMuted;
+    setIsMuted(nextMuted);
   };
 
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
@@ -159,8 +169,17 @@ export default function ProjectModal({ project, onClose }) {
                 ref={videoRef}
                 src={project.videoPreviewUrl}
                 className="w-full"
-                style={{ aspectRatio: '16/9', objectFit: 'cover', maxHeight: 280, display: 'block' }}
-                loop muted playsInline preload="metadata"
+                style={{
+                  aspectRatio: project.aspect === '9:16' ? '9/16' : '16/9',
+                  objectFit: 'contain',
+                  maxHeight: project.aspect === '9:16' ? 440 : 320,
+                  display: 'block',
+                  margin: '0 auto',
+                }}
+                loop
+                muted={isMuted}
+                playsInline
+                preload="metadata"
                 poster={project.coverImage}
                 onEnded={() => setIsVideoPlaying(false)}
               />
@@ -206,10 +225,18 @@ export default function ProjectModal({ project, onClose }) {
                     <button
                       onClick={togglePlay}
                       className="font-mono text-xs text-text-dim hover:text-white transition-colors flex items-center gap-1.5"
+                      title={isVideoPlaying ? 'Pause video' : 'Play video'}
                     >
                       {isVideoPlaying
                         ? <Pause size={11} />
                         : <Play size={11} />}
+                    </button>
+                    <button
+                      onClick={toggleMute}
+                      className="font-mono text-xs text-text-dim hover:text-white transition-colors flex items-center"
+                      title={isMuted ? 'Unmute video audio' : 'Mute video audio'}
+                    >
+                      {isMuted ? <VolumeX size={13} className="text-zinc-500" /> : <Volume2 size={13} className="text-acid" />}
                     </button>
                     {/* Live TC readout */}
                     <span
