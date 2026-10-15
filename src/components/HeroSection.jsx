@@ -32,7 +32,7 @@ export default function HeroSection() {
           {/* Section tag */}
           <motion.p variants={FADE_UP} className="section-label mb-6 flex items-center gap-3">
             <span className="block w-8 h-px bg-border" />
-            Visual Craft Portfolio — 2023–2024
+            Visual Craft Portfolio — 2024–2026
           </motion.p>
 
           {/* Main display heading */}

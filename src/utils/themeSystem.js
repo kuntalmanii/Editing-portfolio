@@ -15,7 +15,7 @@ if (typeof window !== 'undefined') {
     if (saved === 'light' || saved === 'dark') {
       currentTheme = saved;
     }
-  } catch (e) {}
+  } catch {}
 
   // Apply to document root immediately
   applyThemeToDOM(currentTheme);
@@ -42,7 +42,7 @@ export function setTheme(theme) {
   currentTheme = theme;
   try {
     localStorage.setItem('framerate_theme', theme);
-  } catch (e) {}
+  } catch {}
 
   applyThemeToDOM(theme);
   playClickSound(1600, 0.05);

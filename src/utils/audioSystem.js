@@ -14,7 +14,7 @@ if (typeof window !== 'undefined') {
     if (saved !== null) {
       isMuted = saved === 'true';
     }
-  } catch (e) {
+  } catch {
     // ignore localStorage errors in private mode
   }
 }
@@ -40,7 +40,7 @@ export function setAudioEnabled(enabled) {
   isMuted = !enabled;
   try {
     localStorage.setItem('framerate_audio_muted', String(isMuted));
-  } catch (e) {}
+  } catch {}
 
   if (enabled) {
     getAudioContext();
@@ -86,7 +86,7 @@ export function playClickSound(freq = 1400, vol = 0.04) {
 
     osc.start(now);
     osc.stop(now + 0.02);
-  } catch (e) {}
+  } catch {}
 }
 
 /**
@@ -114,7 +114,7 @@ export function playSwitchSound() {
 
     osc.start(now);
     osc.stop(now + 0.035);
-  } catch (e) {}
+  } catch {}
 }
 
 /**
@@ -142,7 +142,7 @@ export function playScrubTick() {
 
     osc.start(now);
     osc.stop(now + 0.008);
-  } catch (e) {}
+  } catch {}
 }
 
 /**
@@ -172,5 +172,5 @@ export function playSuccessSound() {
       osc.start(t);
       osc.stop(t + 0.13);
     });
-  } catch (e) {}
+  } catch {}
 }

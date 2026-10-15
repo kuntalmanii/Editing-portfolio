@@ -139,7 +139,7 @@ export default function RawVault() {
             {/* If tree is collapsed on desktop, show vertical mini-strip */}
             {isTreeCollapsed ? (
               <div className="hidden lg:flex flex-col items-center py-4 gap-3">
-                {rawVaultFolders.map((folder, idx) => {
+                {rawVaultFolders.map((folder) => {
                   const isActive = folder.id === activeFolderId;
                   return (
                     <button
@@ -165,9 +165,8 @@ export default function RawVault() {
                   VOLUMES // FLASH DIRECTORY
                 </div>
 
-                {rawVaultFolders.map((folder, index) => {
+                {rawVaultFolders.map((folder) => {
                   const isActive = folder.id === activeFolderId;
-                  const isLast = index === rawVaultFolders.length - 1;
 
                   return (
                     <div key={folder.id} className="relative">

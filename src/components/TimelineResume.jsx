@@ -370,7 +370,7 @@ export default function TimelineResume() {
 
             {/* ── Timecode Ruler ─────────────────────────────────────── */}
             <div className="h-9 border-b border-[#27272A] bg-[#0E0E14] relative flex items-center">
-              {RULER_TICKS.map((tick, i) => (
+              {RULER_TICKS.map((tick) => (
                 <div
                   key={tick.tc}
                   className="absolute top-0 bottom-0 flex flex-col justify-between font-mono text-[0.5625rem] text-[#52525B]"
@@ -415,8 +415,12 @@ export default function TimelineResume() {
                 return (
                   <div
                     key={track.id}
-                    className={`h-28 border-b border-[#1A1A22] last:border-b-0 relative p-2 transition-opacity ${
-                      isTrackMuted ? 'opacity-30' : 'opacity-100'
+                    className={`h-28 border-b border-[#1A1A22] last:border-b-0 relative p-2 transition-all ${
+                      isTrackMuted 
+                        ? 'opacity-30' 
+                        : isTrackLocked 
+                          ? 'opacity-60 bg-[#000000]/25' 
+                          : 'opacity-100'
                     }`}
                   >
                     {/* Render clips on this track */}
@@ -428,6 +432,7 @@ export default function TimelineResume() {
                           key={clip.id}
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (isTrackLocked) return;
                             playSwitchSound();
                             setSelectedClip(clip);
                           }}
@@ -435,7 +440,9 @@ export default function TimelineResume() {
                             left: `${clip.startPct}%`,
                             width: `${clip.widthPct}%`,
                           }}
-                          className={`absolute top-2 bottom-2 rounded-md p-2 flex flex-col justify-between cursor-pointer transition-all group overflow-hidden border ${
+                          className={`absolute top-2 bottom-2 rounded-md p-2 flex flex-col justify-between transition-all group overflow-hidden border ${
+                            isTrackLocked ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'
+                          } ${
                             isSelected
                               ? 'timeline-clip-selected border-acid bg-[#16161F] shadow-lg ring-1 ring-acid/50 z-20'
                               : 'border-[#27272A] bg-[#101015] hover:border-[#52525B] hover:bg-[#14141B] z-10'

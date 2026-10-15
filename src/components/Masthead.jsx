@@ -139,7 +139,7 @@ export default function Masthead() {
           second: '2-digit',
         });
         setLocalClock(ist);
-      } catch (e) {
+      } catch {
         setLocalClock('14:40:00');
       }
     };

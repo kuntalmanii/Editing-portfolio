@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { 
   RotateCcw, 
   Sparkles, 
@@ -766,7 +765,10 @@ function ColorWheel({ title, sub, value, onChange, masterColor }) {
             transform: 'translate(-50%, -50%)',
           }}
         >
-          <div className="w-1.5 h-1.5 rounded-full bg-acid mx-auto mt-0.5" />
+          <div 
+            className="w-1.5 h-1.5 rounded-full mx-auto mt-0.5 shadow-sm"
+            style={{ backgroundColor: masterColor || 'var(--c-acid)' }}
+          />
         </div>
       </div>
 

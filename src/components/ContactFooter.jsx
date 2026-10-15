@@ -56,7 +56,7 @@ export default function ContactFooter() {
           second: '2-digit',
         });
         setLocalTime(ist);
-      } catch (e) {
+      } catch {
         setLocalTime('14:30:00');
       }
     };
