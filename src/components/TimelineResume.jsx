@@ -1,22 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, AnimatePresence } from 'framer-motion';
 import { 
   Play, 
   Pause, 
   RotateCcw, 
-  Maximize2, 
   Lock, 
-  Volume2, 
-  VolumeX, 
-  Eye, 
-  EyeOff, 
-  Layers, 
   Clock, 
-  Award, 
   Briefcase, 
-  Wrench, 
-  ChevronRight,
-  ExternalLink,
   Film
 } from 'lucide-react';
 import { timelineTracks } from '../data/portfolioData';

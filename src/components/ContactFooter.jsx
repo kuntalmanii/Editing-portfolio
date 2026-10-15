@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Mail, 
   MapPin, 
   Clock, 
   ArrowUpRight, 
@@ -9,7 +8,6 @@ import {
   Check, 
   Copy, 
   Send, 
-  Sparkles,
   CheckCircle2
 } from 'lucide-react';
 import { siteMeta } from '../data/portfolioData';

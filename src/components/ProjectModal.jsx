@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, ExternalLink, Clock, Film, Monitor, Volume2, VolumeX } from 'lucide-react';
+import { X, Play, Pause, Film, Monitor, Volume2, VolumeX } from 'lucide-react';
 import BeforeAfterViewer from './BeforeAfterViewer';
 import { siteMeta } from '../data/portfolioData';
 

@@ -4,18 +4,11 @@ import {
   Folder, 
   FolderOpen, 
   HardDrive, 
-  ChevronRight, 
-  ChevronDown, 
-  Sliders, 
-  Sparkles, 
-  Camera, 
   Database, 
-  Layers, 
   Film,
   PanelLeftClose,
   PanelLeftOpen,
-  Eye,
-  MapPin
+  Eye
 } from 'lucide-react';
 import { rawVaultFolders } from '../data/portfolioData';
 import ExifDrawer from './ExifDrawer';

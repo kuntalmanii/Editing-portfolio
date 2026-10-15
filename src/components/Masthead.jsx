@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, LayoutGroup, useScroll, useSpring } from 'framer-motion';
 import { 
   Volume2, 
@@ -9,10 +9,7 @@ import {
   ArrowUpRight, 
   Mail, 
   Check,
-  Copy,
-  Clock,
-  Sparkles,
-  Activity
+  Clock
 } from 'lucide-react';
 import { useTimecode } from '../hooks/useTimecode';
 import { siteMeta } from '../data/portfolioData';

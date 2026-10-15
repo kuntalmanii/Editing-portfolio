@@ -1,19 +1,13 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Sliders, 
   RotateCcw, 
   Sparkles, 
   Copy, 
   Check, 
-  Eye, 
-  Layers, 
   Activity, 
-  SunMedium, 
   Film, 
-  Palette, 
-  Info,
-  Maximize2
+  Palette
 } from 'lucide-react';
 import { playClickSound, playSuccessSound, playSwitchSound } from '../utils/audioSystem';
 
