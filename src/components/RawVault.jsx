@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { 
   Folder, 
@@ -8,28 +8,56 @@ import {
   Film,
   PanelLeftClose,
   PanelLeftOpen,
-  Eye
+  Eye,
+  ChevronDown
 } from 'lucide-react';
 import { rawVaultFolders } from '../data/portfolioData';
 import ExifDrawer from './ExifDrawer';
+import { playClickSound } from '../utils/audioSystem';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RawVault
 // The RAW Vault section:
 // 1. Two-column desktop split (collapsible file tree left, contact sheet grid right)
-// 2. Interactive folder list (/DCIM/2026_STREET/, /DCIM/STUDIO_PORTRAITS/, /DCIM/NARRATIVE_STILLS/)
+// 2. Interactive folder list (/DCIM/PERSONAL_STILLS/)
 // 3. Photography contact-sheet grid with monospace frame indices & negative-style borders
 // 4. Click opens ExifDrawer inspector overlay
+// 5. Expandable contact-sheet show more / collapse archive toggle
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function RawVault() {
   const [activeFolderId, setActiveFolderId] = useState(rawVaultFolders[0]?.id || 'folder-personal');
   const [isTreeCollapsed, setIsTreeCollapsed] = useState(false);
   const [selectedStillIndex, setSelectedStillIndex] = useState(null);
+  const [showAll, setShowAll] = useState(false);
+
+  // Reset showAll when switching folders
+  useEffect(() => {
+    setShowAll(false);
+  }, [activeFolderId]);
 
   const activeFolder = rawVaultFolders.find((f) => f.id === activeFolderId) || rawVaultFolders[0];
   const items = activeFolder.items || [];
   const selectedStill = selectedStillIndex !== null ? items[selectedStillIndex] : null;
+
+  const INITIAL_COUNT = 4;
+  const visibleItems = showAll ? items : items.slice(0, INITIAL_COUNT);
+  const hasMore = items.length > INITIAL_COUNT;
+  const remainingCount = items.length - INITIAL_COUNT;
+
+  const handleToggleShowMore = () => {
+    playClickSound(1400, 0.04);
+    setShowAll((prev) => {
+      const next = !prev;
+      if (!next) {
+        const el = document.getElementById('vault');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+      return next;
+    });
+  };
 
   // Next / Previous still within currently active folder
   const handleNextStill = () => {
@@ -288,7 +316,7 @@ export default function RawVault() {
 
             <div className="flex items-center gap-2 self-start sm:self-auto font-mono text-[0.625rem] text-[#71717A]">
               <span className="px-2.5 py-1 rounded bg-[#16161D] border border-[#27272A] text-white">
-                {items.length} FRAMES
+                {visibleItems.length} / {items.length} FRAMES
               </span>
               <span className="px-2.5 py-1 rounded bg-[#16161D] border border-[#27272A] text-[#A1A1AA]">
                 1:1 SENSOR REBATE
@@ -300,18 +328,20 @@ export default function RawVault() {
           <LayoutGroup id="raw-contact-grid">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <AnimatePresence mode="popLayout">
-                {items.map((item, idx) => (
-                  <motion.div
-                    key={item.id}
-                    layout
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    onClick={() => setSelectedStillIndex(idx)}
-                    data-cursor="INSPECT"
-                    className="contact-sheet-frame rounded-lg p-3 cursor-pointer group flex flex-col justify-between"
-                  >
+                {visibleItems.map((item, idx) => {
+                  const absoluteIndex = items.findIndex((it) => it.id === item.id);
+                  return (
+                    <motion.div
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.96 }}
+                      transition={{ duration: 0.3, delay: idx * 0.05 }}
+                      onClick={() => setSelectedStillIndex(absoluteIndex !== -1 ? absoluteIndex : idx)}
+                      data-cursor="INSPECT"
+                      className="contact-sheet-frame rounded-lg p-3 cursor-pointer group flex flex-col justify-between"
+                    >
 
                     {/* ── Negative Top Rebate Edge ─────────────────────── */}
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#1E1E24] text-[#71717A] font-mono text-[0.6rem]">
@@ -404,11 +434,46 @@ export default function RawVault() {
                       </div>
                     </div>
 
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
           </LayoutGroup>
+
+          {/* ── Show More / Show Less Action ───────────────────────────────── */}
+          {hasMore && (
+            <div className="flex flex-col items-center justify-center mt-10 pt-2">
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handleToggleShowMore}
+                className="group relative flex items-center gap-3 px-8 py-3.5 rounded-full font-mono text-xs uppercase tracking-widest border border-[#27272A] bg-[#0E0E12] hover:border-acid hover:bg-[#14141A] text-white transition-all shadow-xl select-none"
+                aria-label={showAll ? "Collapse extra stills" : "Show more raw vault stills"}
+              >
+                {/* Live pulsing pip */}
+                <span className="w-2 h-2 rounded-full bg-acid shadow-acid-glow animate-pulse" />
+                
+                <span className="font-bold">
+                  {showAll ? 'COLLAPSE ARCHIVE' : `SHOW MORE STILLS (+${remainingCount})`}
+                </span>
+
+                <ChevronDown 
+                  className={`w-4 h-4 text-acid transition-transform duration-300 ${
+                    showAll ? 'rotate-180' : 'group-hover:translate-y-0.5'
+                  }`} 
+                />
+              </motion.button>
+
+              <p className="font-mono text-[0.625rem] text-[#71717A] mt-3 tracking-wider uppercase">
+                {showAll 
+                  ? `Displaying all ${items.length} uncompressed camera plates` 
+                  : `Showing first ${INITIAL_COUNT} plates · ${remainingCount} additional captures in volume`
+                }
+              </p>
+            </div>
+          )}
 
         </div>
 
