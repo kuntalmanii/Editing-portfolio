@@ -187,10 +187,12 @@ function ProjectCard({ project, index, onOpen }) {
     setHovering(true);
     const vid = videoRef.current;
     if (vid) {
-      vid.currentTime = 0;
+      if (vid.currentTime === 0 && project.id === 'vp-tech-summit') {
+        vid.currentTime = 2.0;
+      }
       vid.play().catch(() => {});
     }
-  }, []);
+  }, [project.id]);
 
   const handlePointerLeave = useCallback(() => {
     setHovering(false);
@@ -219,7 +221,8 @@ function ProjectCard({ project, index, onOpen }) {
   }[project.category] ?? '#A1A1AA';
 
   const isVertical = project.aspect === '9:16' || project.aspect?.includes('9:16');
-  const cardAspectRatio = isVertical ? '9/16' : project.aspect?.includes('2.39') ? '2.39/1' : '16/10';
+  const isCinematic = project.aspect?.includes('2.39');
+  const cardAspectRatio = isVertical ? '9/16' : isCinematic ? '2.39/1' : '16/9';
 
   return (
     <motion.article
@@ -234,10 +237,10 @@ function ProjectCard({ project, index, onOpen }) {
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     >
-      {/* ── Thumbnail / video area (Preserving Original Aspect Ratio) ─────────── */}
+      {/* ── Thumbnail / video area (Preserving Original Aspect Ratio & Full Bleed) ── */}
       <div 
-        className="relative overflow-hidden bg-black flex items-center justify-center" 
-        style={{ aspectRatio: cardAspectRatio, maxHeight: isVertical ? '520px' : 'none' }}
+        className="relative overflow-hidden bg-black w-full flex items-center justify-center" 
+        style={{ aspectRatio: cardAspectRatio }}
       >
         {/* Soft ambient blur fill to eliminate harsh borders */}
         <img
@@ -251,11 +254,11 @@ function ProjectCard({ project, index, onOpen }) {
         <img
           src={project.coverImage}
           alt={project.title}
-          className="relative z-10 w-full h-full object-contain"
+          className="relative z-10 w-full h-full object-cover"
           style={{
             transition: 'opacity 0.4s ease, transform 0.6s ease',
             opacity: hovering && videoReady ? 0 : 1,
-            transform: hovering ? 'scale(1.02)' : 'scale(1)',
+            transform: hovering ? 'scale(1.03)' : 'scale(1)',
           }}
           loading="lazy"
         />
@@ -264,7 +267,7 @@ function ProjectCard({ project, index, onOpen }) {
         <video
           ref={videoRef}
           src={project.videoPreviewUrl}
-          className="relative z-10 w-full h-full object-contain"
+          className="relative z-10 w-full h-full object-cover"
           muted loop playsInline preload="none"
           style={{
             opacity: hovering && videoReady ? 1 : 0,
