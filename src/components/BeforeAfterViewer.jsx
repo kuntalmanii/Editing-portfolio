@@ -92,7 +92,7 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
       <div
         ref={containerRef}
         data-cursor="DRAG"
-        className="relative overflow-hidden flex-1 split-slider-container bg-black"
+        className="relative overflow-hidden flex-1 split-slider-container bg-black touch-none"
         style={{
           aspectRatio: viewerAspectRatio,
           maxHeight: isVertical ? '540px' : 'none',
@@ -101,6 +101,7 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
           cursor: isDragging ? 'grabbing' : 'col-resize',
           userSelect: 'none',
           WebkitUserSelect: 'none',
+          touchAction: 'none',
           minHeight: 240,
         }}
         onMouseDown={onMouseDown}

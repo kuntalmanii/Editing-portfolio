@@ -57,11 +57,18 @@ export default function ProjectModal({ project, onClose }) {
     if (Math.abs(vid.currentTime - t) > 0.5) vid.currentTime = t;
   }, [scrubPct]);
 
+  // ── Scrub bar pointer state & ref ────────────────────────────────────────
+  const [scrubDragging, setScrubDragging] = useState(false);
+  const scrubDraggingRef = useRef(false);
+  scrubDraggingRef.current = scrubDragging;
+
   // ── Update scrub from video playback ─────────────────────────────────────
   const syncScrub = useCallback(() => {
     const vid = videoRef.current;
     if (!vid || !vid.duration) return;
-    setScrubPct((vid.currentTime / vid.duration) * 100);
+    if (!scrubDraggingRef.current) {
+      setScrubPct((vid.currentTime / vid.duration) * 100);
+    }
     rafRef.current = requestAnimationFrame(syncScrub);
   }, []);
 
@@ -69,9 +76,29 @@ export default function ProjectModal({ project, onClose }) {
     const vid = videoRef.current;
     if (!vid) return;
     if (vid.paused) {
-      vid.play();
-      setIsVideoPlaying(true);
-      rafRef.current = requestAnimationFrame(syncScrub);
+      const playPromise = vid.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsVideoPlaying(true);
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+            rafRef.current = requestAnimationFrame(syncScrub);
+          })
+          .catch(() => {
+            // Browser autoplay/sound policy rejection fallback to muted
+            vid.muted = true;
+            setIsMuted(true);
+            vid.play()
+              .then(() => {
+                setIsVideoPlaying(true);
+                if (rafRef.current) cancelAnimationFrame(rafRef.current);
+                rafRef.current = requestAnimationFrame(syncScrub);
+              })
+              .catch(() => {
+                setIsVideoPlaying(false);
+              });
+          });
+      }
     } else {
       vid.pause();
       setIsVideoPlaying(false);
@@ -88,10 +115,18 @@ export default function ProjectModal({ project, onClose }) {
     setIsMuted(nextMuted);
   };
 
-  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
-
-  // ── Scrub bar pointer ─────────────────────────────────────────────────────
-  const [scrubDragging, setScrubDragging] = useState(false);
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (videoRef.current) {
+        try {
+          videoRef.current.pause();
+        } catch {
+          // ignore error
+        }
+      }
+    };
+  }, []);
 
   const handleScrub = useCallback((clientX) => {
     if (!scrubRef.current) return;
@@ -119,10 +154,9 @@ export default function ProjectModal({ project, onClose }) {
   const TABS = ['GRADE', 'PROJECT', 'COMPARE'];
 
   return (
-    <AnimatePresence>
-      <motion.div
-        key="backdrop"
-        variants={BACKDROP}
+    <motion.div
+      key="backdrop"
+      variants={BACKDROP}
         initial="hidden" animate="visible" exit="exit"
         className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
         style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)' }}
@@ -306,7 +340,6 @@ export default function ProjectModal({ project, onClose }) {
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
   );
 }
 

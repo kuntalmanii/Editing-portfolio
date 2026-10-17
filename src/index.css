@@ -271,6 +271,42 @@
   color: #09090B !important;
 }
 
+/* Exempt inherently dark plates, video players, HUD badges, and contact sheet frames from light text inversion */
+[data-theme="light"] :is(
+  .contact-sheet-frame,
+  .filter-pill-active,
+  .raw-log-plate,
+  .film-strip-cell,
+  [class*="bg-black"],
+  [class*="bg-[#08080A]"],
+  [class*="bg-[#0B0B0E]"],
+  [class*="bg-[#111116]"],
+  [class*="bg-[#16161E]"],
+  [class*="bg-[#0E0E14]"]
+) .text-white,
+[data-theme="light"] .filter-pill-active,
+[data-theme="light"] [class*="bg-black"] .text-white,
+[data-theme="light"] [class*="bg-[#08080A]"] .text-white {
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] :is(
+  .contact-sheet-frame,
+  .filter-pill-active,
+  .raw-log-plate,
+  .film-strip-cell,
+  [class*="bg-black"],
+  [class*="bg-[#08080A]"],
+  [class*="bg-[#0B0B0E]"],
+  [class*="bg-[#111116]"],
+  [class*="bg-[#16161E]"],
+  [class*="bg-[#0E0E14]"]
+) .text-acid,
+[data-theme="light"] [class*="bg-black"] .text-acid,
+[data-theme="light"] [class*="bg-[#08080A]"] .text-acid {
+  color: #E2F952 !important;
+}
+
 [data-theme="light"] .text-text {
   color: #09090B !important;
 }
@@ -324,12 +360,12 @@
 
 /* Ensure acid text on white has strong contrast */
 [data-theme="light"] .text-acid {
-  color: #09090B !important;
+  color: #09090B;
 }
 
 /* Ensure acid borders in light mode don't wash out */
 [data-theme="light"] .border-acid {
-  border-color: #09090B !important;
+  border-color: #09090B;
 }
 
 [data-theme="light"] .shadow-acid-glow {

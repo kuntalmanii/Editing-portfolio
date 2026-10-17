@@ -76,7 +76,7 @@ export default function RawVault() {
   const totalAssetsCount = rawVaultFolders.reduce((sum, f) => sum + (f.items?.length || 0), 0);
 
   return (
-    <section id="vault" className="relative py-24 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+    <section id="vault" className="relative py-24 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto scroll-mt-24">
 
       {/* ── Section Header ─────────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -480,17 +480,20 @@ export default function RawVault() {
       </div>
 
       {/* ── EXIF Inspector Overlay Drawer ──────────────────────────────── */}
-      {selectedStill && (
-        <ExifDrawer
-          item={selectedStill}
-          folder={activeFolder}
-          onClose={() => setSelectedStillIndex(null)}
-          onSelectNext={handleNextStill}
-          onSelectPrev={handlePrevStill}
-          hasNext={selectedStillIndex < items.length - 1}
-          hasPrev={selectedStillIndex > 0}
-        />
-      )}
+      <AnimatePresence>
+        {selectedStill && (
+          <ExifDrawer
+            key="exif-drawer"
+            item={selectedStill}
+            folder={activeFolder}
+            onClose={() => setSelectedStillIndex(null)}
+            onSelectNext={handleNextStill}
+            onSelectPrev={handlePrevStill}
+            hasNext={selectedStillIndex < items.length - 1}
+            hasPrev={selectedStillIndex > 0}
+          />
+        )}
+      </AnimatePresence>
 
     </section>
   );

@@ -63,6 +63,7 @@ export default function Masthead() {
   const handleNavClick = (id) => {
     playClickSound(1300, 0.04);
     setActiveSection(id);
+    setHoveredNav(null);
     isClickScrollingRef.current = true;
     if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
     clickTimeoutRef.current = setTimeout(() => {
@@ -197,6 +198,7 @@ export default function Masthead() {
     };
 
     const onScroll = () => {
+      setHoveredNav(null);
       if (!ticking) {
         window.requestAnimationFrame(checkActiveSection);
         ticking = true;

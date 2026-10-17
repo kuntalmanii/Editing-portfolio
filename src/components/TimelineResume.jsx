@@ -159,7 +159,7 @@ export default function TimelineResume() {
     <section 
       id="process" 
       ref={sectionRef} 
-      className="relative py-24 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto"
+      className="relative py-24 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto scroll-mt-24"
     >
 
       {/* ── Section Heading ─────────────────────────────────────────────── */}
@@ -376,12 +376,12 @@ export default function TimelineResume() {
                   className="absolute top-0 bottom-0 flex flex-col justify-between font-mono text-[0.5625rem] text-[#52525B]"
                   style={{ left: `${tick.pct}%`, transform: tick.pct === 100 ? 'translateX(-100%)' : 'none' }}
                 >
-                  <div className="flex items-center gap-1 pt-1.5 pl-1.5">
+                  <div className={`flex items-center gap-1 pt-1.5 ${tick.pct === 100 ? 'pr-2' : 'pl-1.5'}`}>
                     <span className="text-[#A1A1AA] font-bold">{tick.year}</span>
-                    <span className="text-[#3F3F46]">·</span>
-                    <span className="hidden sm:inline text-[#71717A]">{tick.tc}</span>
+                    <span className={`text-[#3F3F46] ${tick.year === '2025' ? 'hidden lg:inline' : 'hidden sm:inline'}`}>·</span>
+                    <span className={`text-[#71717A] ${tick.year === '2025' ? 'hidden lg:inline' : 'hidden sm:inline'}`}>{tick.tc}</span>
                   </div>
-                  <div className="w-px h-2 bg-[#27272A]" />
+                  <div className={`w-px h-2 bg-[#27272A] ${tick.pct === 100 ? 'self-end mr-0' : ''}`} />
                 </div>
               ))}
 
@@ -482,7 +482,7 @@ export default function TimelineResume() {
                             {clip.tags?.slice(0, 2).map((tag) => (
                               <span
                                 key={tag}
-                                className="font-mono text-[0.45rem] px-1.5 py-0.2 rounded bg-[#08080A] text-[#71717A] border border-[#1E1E24] tracking-wider uppercase flex-none"
+                                className="font-mono text-[0.45rem] px-1.5 py-0.5 rounded bg-[#08080A] text-[#71717A] border border-[#1E1E24] tracking-wider uppercase flex-none"
                               >
                                 {tag}
                               </span>

@@ -94,7 +94,7 @@ export default function ContactFooter() {
   };
 
   return (
-    <footer id="contact" className="relative pt-20 sm:pt-28 pb-12 px-5 sm:px-8 md:px-12 max-w-7xl mx-auto">
+    <footer id="contact" className="relative pt-20 sm:pt-28 pb-12 px-5 sm:px-8 md:px-12 max-w-7xl mx-auto scroll-mt-24">
       
       {/* ── Top Header & Direct Action Split ──────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 mb-20 items-start">
@@ -213,17 +213,26 @@ export default function ContactFooter() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      playClickSound(1200, 0.04);
-                      setIsSent(false);
-                      setFormData({ name: '', email: '', projectType: 'Commercial TVC', message: '' });
-                    }}
-                    className="mt-4 px-5 py-2.5 rounded-xl bg-[var(--c-surface-inner)] border border-[var(--c-border)] hover:border-acid text-xs font-mono text-[var(--c-text)] hover:text-acid transition-all"
-                  >
-                    SEND ANOTHER MESSAGE
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playClickSound(1200, 0.04);
+                        setIsSent(false);
+                        setFormData({ name: '', email: '', projectType: 'Commercial TVC', message: '' });
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-[var(--c-surface-inner)] border border-[var(--c-border)] hover:border-acid text-xs font-mono text-[var(--c-text)] hover:text-acid transition-all"
+                    >
+                      SEND ANOTHER MESSAGE
+                    </button>
+                    <a
+                      href={`mailto:${siteMeta.email}?subject=${encodeURIComponent(`Project Inquiry: ${formData.projectType || 'Commercial'} - ${formData.name || 'Client'}`)}&body=${encodeURIComponent(`Client: ${formData.name}\nEmail: ${formData.email}\nScope: ${formData.projectType}\n\nBrief:\n${formData.message}`)}`}
+                      className="px-5 py-2.5 rounded-xl bg-acid text-black text-xs font-mono font-bold hover:bg-white transition-all flex items-center gap-1.5"
+                    >
+                      <span>OPEN IN MAIL CLIENT</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
                 </motion.div>
               ) : (
                 /* Standard Clean Editorial Form */

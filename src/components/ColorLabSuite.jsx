@@ -242,7 +242,7 @@ export default function ColorLabSuite() {
   const gainColor = `rgba(${Math.max(0, Math.round(128 + gain.x * 255))}, ${Math.max(0, Math.round(128 - (gain.x + gain.y) * 130))}, ${Math.max(0, Math.round(128 + gain.y * 255))}, ${Math.min(0.4, Math.hypot(gain.x, gain.y) * 0.6)})`;
 
   return (
-    <section id="colorlab" className="relative py-24 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+    <section id="colorlab" className="relative py-24 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto scroll-mt-24">
       
       {/* ── Section Title & Telemetry Header ───────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
@@ -386,7 +386,7 @@ export default function ColorLabSuite() {
               alt="Flat Raw Camera Log"
               className="absolute inset-0 w-full h-full object-cover raw-log-plate"
               style={{
-                width: wipeContainerRef.current ? wipeContainerRef.current.clientWidth : '100vw',
+                width: `${(100 / splitPct) * 100}%`,
                 maxWidth: 'none',
               }}
               draggable={false}
@@ -408,7 +408,7 @@ export default function ColorLabSuite() {
           {/* ── Draggable Wipe Hairline Divider ────────────────────────────── */}
           <div
             onPointerDown={onWipePointerDown}
-            className="absolute top-0 bottom-0 z-30 flex items-center justify-center cursor-col-resize group"
+            className="absolute top-0 bottom-0 z-30 flex items-center justify-center cursor-col-resize group touch-none"
             style={{ left: `${splitPct}%`, transform: 'translateX(-50%)', width: 28 }}
           >
             {/* Glowing vertical hairline line */}
@@ -732,7 +732,7 @@ function ColorWheel({ title, sub, value, onChange, masterColor }) {
         ref={wheelRef}
         onPointerDown={onPointerDown}
         onDoubleClick={resetWheel}
-        className="relative rounded-full cursor-crosshair select-none shadow-inner border border-white/10"
+        className="relative rounded-full cursor-crosshair select-none shadow-inner border border-white/10 touch-none"
         style={{
           width: radius * 2,
           height: radius * 2,

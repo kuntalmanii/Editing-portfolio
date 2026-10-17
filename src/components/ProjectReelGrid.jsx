@@ -45,7 +45,7 @@ export default function ProjectReelGrid() {
   };
 
   return (
-    <section id="work" className="relative py-20 px-5 md:px-8 max-w-7xl mx-auto">
+    <section id="work" className="relative py-20 px-5 md:px-8 max-w-7xl mx-auto scroll-mt-24">
 
       {/* ── Section header ─────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10">
@@ -239,7 +239,7 @@ function ProjectCard({ project, index, onOpen }) {
     >
       {/* ── Thumbnail / video area (Preserving Original Aspect Ratio & Full Bleed) ── */}
       <div 
-        className="relative overflow-hidden bg-black w-full flex items-center justify-center" 
+        className="relative overflow-hidden bg-black w-full" 
         style={{ aspectRatio: cardAspectRatio }}
       >
         {/* Soft ambient blur fill to eliminate harsh borders */}
@@ -254,7 +254,7 @@ function ProjectCard({ project, index, onOpen }) {
         <img
           src={project.coverImage}
           alt={project.title}
-          className="relative z-10 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
           style={{
             transition: 'opacity 0.4s ease, transform 0.6s ease',
             opacity: hovering && videoReady ? 0 : 1,
@@ -267,18 +267,19 @@ function ProjectCard({ project, index, onOpen }) {
         <video
           ref={videoRef}
           src={project.videoPreviewUrl}
-          className="relative z-10 w-full h-full object-cover"
-          muted loop playsInline preload="none"
+          className="absolute inset-0 w-full h-full object-cover"
+          muted loop playsInline preload="metadata"
           style={{
             opacity: hovering && videoReady ? 1 : 0,
             transition: 'opacity 0.4s ease',
           }}
           onCanPlay={() => setVideoReady(true)}
+          onLoadedData={() => setVideoReady(true)}
         />
 
         {/* Gradient overlay */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 pointer-events-none"
           style={{ background: 'linear-gradient(to top, rgba(8,8,10,0.85) 0%, rgba(8,8,10,0.1) 50%, transparent 100%)' }}
         />
 

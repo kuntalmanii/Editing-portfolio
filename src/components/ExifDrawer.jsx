@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   X, 
   Folder, 
@@ -97,8 +97,7 @@ export default function ExifDrawer({
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="EXIF Inspector">
+    <motion.div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="EXIF Inspector">
 
         {/* ── Dark blur backdrop ────────────────────────────────────────── */}
         <motion.div
@@ -500,8 +499,7 @@ export default function ExifDrawer({
           </div>
 
         </motion.aside>
-      </div>
-    </AnimatePresence>
+      </motion.div>
   );
 }
 

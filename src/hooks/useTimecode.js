@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 export function useTimecode(fps = 24) {
   const startRef = useRef(Date.now());
   const [tc, setTc] = useState('00:00:00:00');
+  const lastTcRef = useRef('00:00:00:00');
 
   useEffect(() => {
     let raf;
@@ -20,7 +21,11 @@ export function useTimecode(fps = 24) {
       const mm = Math.floor(totalSecs / 60) % 60;
       const hh = Math.floor(totalSecs / 3600);
       const pad = (n, len = 2) => String(n).padStart(len, '0');
-      setTc(`${pad(hh)}:${pad(mm)}:${pad(ss)}:${pad(ff)}`);
+      const nextTc = `${pad(hh)}:${pad(mm)}:${pad(ss)}:${pad(ff)}`;
+      if (nextTc !== lastTcRef.current) {
+        lastTcRef.current = nextTc;
+        setTc(nextTc);
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

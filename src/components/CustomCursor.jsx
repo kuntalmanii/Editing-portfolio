@@ -82,11 +82,9 @@ export default function CustomCursor() {
           stiffness: 400,
           mass: 0.15,
         }}
-        style={{
-          transform: 'translate(-50%, -50%)',
-        }}
       >
-        <AnimatePresence mode="wait">
+        <div className="-translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+          <AnimatePresence mode="wait">
           {cursorType === 'DRAG' ? (
             /* Contextual DRAG pill */
             <motion.div
@@ -136,7 +134,8 @@ export default function CustomCursor() {
             />
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
+    </motion.div>
     </div>
   );
 }
