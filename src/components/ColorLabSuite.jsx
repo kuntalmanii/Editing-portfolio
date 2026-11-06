@@ -194,7 +194,7 @@ export default function ColorLabSuite() {
 </ColorCorrection>`;
 
     if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(cdlXml);
+      navigator.clipboard.writeText(cdlXml).catch(() => {});
     }
     setCopiedCDL(true);
     setTimeout(() => setCopiedCDL(false), 2400);

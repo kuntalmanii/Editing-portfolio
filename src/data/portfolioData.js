@@ -249,7 +249,7 @@ export const videoProjects = [
     subtitle: "Automotive campaign",
     category: "COMMERCIAL",
     client: "Meridian Motors",
-    runTime: "0:60",
+    runTime: "1:00",
     runTimeSeconds: 60,
     colorSpace: "S-Log3 → Rec.709",
     grade: "High-contrast chrome grade",

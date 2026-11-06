@@ -30,11 +30,12 @@ export default function CustomCursor() {
 
       // Inspect target element for cursor cues
       const target = e.target;
-      if (!target) return;
+      const el = target instanceof Element ? target : target?.parentElement;
+      if (!el) return;
 
-      const closestDrag = target.closest('[data-cursor="DRAG"]') || target.closest('.split-slider-container');
-      const closestInspect = target.closest('[data-cursor="INSPECT"]') || target.closest('.contact-sheet-frame');
-      const closestInteractive = target.closest('button, a, input, [role="button"]');
+      const closestDrag = el.closest('[data-cursor="DRAG"]') || el.closest('.split-slider-container');
+      const closestInspect = el.closest('[data-cursor="INSPECT"]') || el.closest('.contact-sheet-frame');
+      const closestInteractive = el.closest('button, a, input, [role="button"]');
 
       if (closestDrag) {
         setCursorType('DRAG');

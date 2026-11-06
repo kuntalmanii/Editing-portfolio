@@ -79,7 +79,7 @@ export default function Masthead() {
   const totalFramesApprox = useMemo(() => {
     const [h, m, s, f] = tcParts.map(Number);
     return ((h || 0) * 3600 + (m || 0) * 60 + (s || 0)) * 24 + (f || 0);
-  }, [tcParts]);
+  }, [timecode]);
 
   const cycleTimecodeMode = () => {
     playClickSound(1500, 0.04);
@@ -231,7 +231,7 @@ export default function Masthead() {
   const copyEmailDirect = () => {
     playSuccessSound();
     if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(siteMeta.email);
+      navigator.clipboard.writeText(siteMeta.email).catch(() => {});
     }
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2200);

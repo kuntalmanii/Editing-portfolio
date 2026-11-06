@@ -23,6 +23,12 @@ import {
 // - Next/Prev still cycling within active directory
 // ─────────────────────────────────────────────────────────────────────────────
 
+const DRAWER_CONTAINER = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 1, transition: { duration: 0.28 } },
+};
+
 const BACKDROP = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.25 } },
@@ -72,10 +78,13 @@ export default function ExifDrawer({
         onSelectNext();
       } else if (e.key === 'ArrowLeft' && onSelectPrev && hasPrev) {
         onSelectPrev();
-      } else if (e.key === 'Tab') {
-        // Space / Tab quick preview toggle
-        e.preventDefault();
-        setViewMode((m) => (m === 'RAW' ? 'PROCESSED' : 'RAW'));
+      } else if (e.key === ' ' || e.key.toLowerCase() === 'p') {
+        // Space / P key quick preview toggle (when not focused on a button or input)
+        const activeTag = document.activeElement?.tagName;
+        if (activeTag !== 'BUTTON' && activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
+          e.preventDefault();
+          setViewMode((m) => (m === 'RAW' ? 'PROCESSED' : 'RAW'));
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -91,13 +100,24 @@ export default function ExifDrawer({
 
   const copyPath = () => {
     const fullPath = `${folder?.path || '/DCIM/'}${frameIndex}`;
-    navigator.clipboard?.writeText(fullPath);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(fullPath).catch(() => {});
+    }
     setCopiedFormat(true);
     setTimeout(() => setCopiedFormat(false), 2000);
   };
 
   return (
-    <motion.div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="EXIF Inspector">
+    <motion.div 
+      variants={DRAWER_CONTAINER}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="fixed inset-0 z-50 flex justify-end" 
+      role="dialog" 
+      aria-modal="true" 
+      aria-label="EXIF Inspector"
+    >
 
         {/* ── Dark blur backdrop ────────────────────────────────────────── */}
         <motion.div

@@ -78,7 +78,7 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
     };
   }, [isDragging, onMouseMove, onMouseUp, onTouchMove, onTouchEnd]);
 
-  const isVertical = project?.aspect === '9:16' || project?.aspect?.includes('9:16');
+  const isVertical = project?.orientation === 'vertical' || project?.aspect === '9:16';
   const viewerAspectRatio = isVertical 
     ? '9/16' 
     : project?.aspect?.includes('2.39') 
@@ -132,7 +132,7 @@ export default function BeforeAfterViewer({ before, after, gradeSpecs, project }
               height: '100%',
               objectFit: 'cover',
               pointerEvents: 'none',
-              filter: 'saturate(0.35) brightness(1.05)',
+              filter: before === after ? 'saturate(0.35) brightness(1.05)' : 'none',
             }}
           />
           {/* LOG label */}

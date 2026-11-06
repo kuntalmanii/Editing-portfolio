@@ -138,6 +138,7 @@ export default function ProjectReelGrid() {
       <AnimatePresence>
         {selectedProject && (
           <ProjectModal
+            key={selectedProject.id}
             project={selectedProject}
             onClose={() => setSelectedProject(null)}
           />
@@ -180,10 +181,12 @@ function FilterPill({ label, active, count, onClick }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function ProjectCard({ project, index, onOpen }) {
   const videoRef = useRef(null);
+  const timeoutRef = useRef(null);
   const [hovering, setHovering] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
 
   const handlePointerEnter = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setHovering(true);
     const vid = videoRef.current;
     if (vid) {
@@ -199,11 +202,17 @@ function ProjectCard({ project, index, onOpen }) {
     const vid = videoRef.current;
     if (vid) {
       vid.pause();
-      // Fade back to poster
-      setTimeout(() => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
         if (videoRef.current) videoRef.current.currentTime = 0;
       }, 350);
     }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, []);
 
   const CARD = {
@@ -220,7 +229,7 @@ function ProjectCard({ project, index, onOpen }) {
     NARRATIVE: '#FB923C',
   }[project.category] ?? '#A1A1AA';
 
-  const isVertical = project.aspect === '9:16' || project.aspect?.includes('9:16');
+  const isVertical = project.orientation === 'vertical' || project.aspect === '9:16';
   const isCinematic = project.aspect?.includes('2.39');
   const cardAspectRatio = isVertical ? '9/16' : isCinematic ? '2.39/1' : '16/9';
 

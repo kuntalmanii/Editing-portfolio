@@ -69,7 +69,7 @@ export default function ContactFooter() {
   const copyEmail = useCallback(() => {
     playSuccessSound();
     if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(siteMeta.email);
+      navigator.clipboard.writeText(siteMeta.email).catch(() => {});
     }
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2400);

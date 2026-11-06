@@ -204,9 +204,9 @@ export default function ProjectModal({ project, onClose }) {
                 src={project.videoPreviewUrl}
                 className="w-full"
                 style={{
-                  aspectRatio: project.aspect === '9:16' ? '9/16' : '16/9',
+                  aspectRatio: (project.orientation === 'vertical' || project.aspect === '9:16') ? '9/16' : '16/9',
                   objectFit: 'contain',
-                  maxHeight: project.aspect === '9:16' ? 440 : 320,
+                  maxHeight: (project.orientation === 'vertical' || project.aspect === '9:16') ? 440 : 320,
                   display: 'block',
                   margin: '0 auto',
                 }}
@@ -215,7 +215,10 @@ export default function ProjectModal({ project, onClose }) {
                 playsInline
                 preload="metadata"
                 poster={project.coverImage}
-                onEnded={() => setIsVideoPlaying(false)}
+                onEnded={() => {
+                  setIsVideoPlaying(false);
+                  if (rafRef.current) cancelAnimationFrame(rafRef.current);
+                }}
               />
               {/* Play overlay */}
               {!isVideoPlaying && (
@@ -237,7 +240,7 @@ export default function ProjectModal({ project, onClose }) {
                 {/* Timecode scrub bar */}
                 <div
                   ref={scrubRef}
-                  className="relative h-1 rounded-full mb-2 cursor-pointer group"
+                  className="relative h-1 rounded-full mb-2 cursor-pointer group touch-none"
                   style={{ background: 'rgba(255,255,255,0.15)' }}
                   onMouseDown={(e) => { setScrubDragging(true); handleScrub(e.clientX); }}
                   onTouchStart={(e) => { setScrubDragging(true); handleScrub(e.touches[0].clientX); }}
